@@ -1676,6 +1676,25 @@ class _Session:
         return None
 
 
+@pytest.mark.parametrize("partial", ["半句话", ""])
+def test_incomplete_answer_warns_user_without_exposing_runtime_error(partial):
+    class FailedSession(_Session):
+        def run_turn(self, **kwargs):
+            result = super().run_turn(**kwargs)
+            result.update(result=partial, error="DeepSeek Harness turn ended with max-tokens")
+            return result
+
+    service = FinancialQaCcService(enabled=True, session_service=FailedSession())
+    result = service.answer(
+        thread_id=23, turn_id=1, owner_id="owner-a", user_text="查询资金流",
+        dispatch_plan={"selected_agent": "investment_analyst", "turn_mode": "normal_qa"},
+    )
+    assert "本次回答未完成" in result["message"]
+    assert "max-tokens" not in result["message"]
+    assert partial in result["message"]
+    assert result["financial_qa"]["error"]
+
+
 @pytest.mark.parametrize("thread_id,data_only,has_paging", [
     (23, False, True), ("23", False, True), ("finance-api-fixture", False, False),
     (23, True, False),

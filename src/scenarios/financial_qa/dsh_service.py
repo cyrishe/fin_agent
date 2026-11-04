@@ -48,7 +48,7 @@ _DEFAULT_LOOP_POLICY_CONFIG: dict[str, Any] = {
         "fast_query": {"reasoningEffort": "low", "maxTokens": 3072},
         "repair": {"reasoningEffort": "low", "maxTokens": 3072},
         "details": {"reasoningEffort": "off", "maxTokens": 2048},
-        "final": {"reasoningEffort": "off", "maxTokens": 2048},
+        "final": {"reasoningEffort": "off", "maxTokens": 8192},
     },
     "resultProjection": {
         "enabled": True,

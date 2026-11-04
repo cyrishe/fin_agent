@@ -583,9 +583,10 @@ class FinancialQaCcService:
             if isinstance(item, Mapping)
         ]
         error = _trim(record.get("error"))
-        generated_message = _trim(record.get("result")) or (
-            f"金融专业问答暂时未完成：{error}" if error else "金融专业问答暂时没有返回内容。"
-        )
+        generated_message = _trim(record.get("result")) or "金融专业问答暂时没有返回内容。"
+        if error:
+            notice = "本次回答未完成，以下内容可能不完整，请重试。"
+            generated_message = f"{notice}\n\n{generated_message}" if _trim(record.get("result")) else notice
         if not error and (data_only or not record.get("skill_entries")):
             generated_message = (
                 _all_zero_result_summary(result_refs) or generated_message

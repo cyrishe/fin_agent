@@ -2008,9 +2008,10 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
                 *result_blocks,
             ]
         )
+        finance_failed = bool((result.get("financial_qa") or {}).get("error"))
         final_events = _settle_terminal_progress_blocks(
             final_events,
-            failed=bool(str(result.get("error") or "").strip()),
+            failed=finance_failed or bool(str(result.get("error") or "").strip()),
         )
         result["surface_blocks"] = final_events
         _attach_answer_summary(
@@ -2023,6 +2024,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
             turn_id=turn_id,
             assistant_output_text=assistant_message,
             output_payload=_persistable_output_payload(result),
+            status="failed" if finance_failed else "completed",
             model_name=str(result.get("model_name") or "").strip(),
             token_usage=result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
         ) or _turn_meta(payload.get("request_received_at"))
@@ -2034,7 +2036,7 @@ def _run_custom_tool_stream_payload(payload: dict, *, emit) -> None:
             "run_id": builder.run_id,
             "thread_id": thread_id,
             "turn_id": turn_id,
-            "message": "任务已完成",
+            "message": "任务未完成" if finance_failed else "任务已完成",
             "result": result,
         })
     except ContextResolutionError as exc:
@@ -4495,6 +4497,7 @@ def api_chat_dispatch():
             turn_id=turn_id,
             assistant_output_text=assistant_message,
             output_payload=_persistable_output_payload(result),
+            status="failed" if (result.get("financial_qa") or {}).get("error") else "completed",
             model_name=str(result.get("model_name") or "").strip(),
             token_usage=result.get("llm_usage") if isinstance(result.get("llm_usage"), dict) else None,
         ) or _turn_meta(request_received_at)

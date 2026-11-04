@@ -33,7 +33,7 @@ const DEFAULT_BUDGETS = Object.freeze({
   fast_query: Object.freeze({ reasoningEffort: 'low', maxTokens: 3072 }),
   repair: Object.freeze({ reasoningEffort: 'low', maxTokens: 3072 }),
   details: Object.freeze({ reasoningEffort: 'off', maxTokens: 2048 }),
-  final: Object.freeze({ reasoningEffort: 'off', maxTokens: 2048 }),
+  final: Object.freeze({ reasoningEffort: 'off', maxTokens: 8192 }),
 })
 
 const DEFAULT_RESULT_PROJECTION = Object.freeze({

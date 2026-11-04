@@ -1744,7 +1744,7 @@ test('Skill budgets are configurable and exclude fast and data-only requests', a
       completeCall(runtime, 2, 'c', NAMES.catalog, { mode: 'dataview' })
       completeCall(runtime, 3, 'q', NAMES.query, { ok: true, sample_complete: true, result_ref: 'session://r' })
       const request = await runtime.request({})
-      if (Object.keys(context).length) assert.ok(request.maxTokens <= 3072)
+      if (Object.keys(context).length) assert.ok(request.maxTokens <= 8192)
       else assert.equal(request.maxTokens, 9000)
     })
   }

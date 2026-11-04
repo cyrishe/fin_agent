@@ -74,6 +74,26 @@ class _ToolDevelopmentDispatchPlannerStub:
         return self.plan_free_chat(**kwargs)
 
 
+def test_finance_stream_records_incomplete_answer_as_failed(monkeypatch):
+    conversations = _ConversationRuntimeStub()
+    emitted = []
+    monkeypatch.setattr(web, "application_runtime_service", _ApplicationRuntimeStub())
+    monkeypatch.setattr(web, "runtime_conversation_service", conversations)
+    monkeypatch.setattr(web, "assistant_dispatch_planner", _NormalFinanceDispatchPlannerStub())
+    monkeypatch.setattr(web, "_build_chat_dispatch_payload", lambda *args, **kwargs: {
+        "mode": "financial_qa_dsh", "message": "本次回答未完成。",
+        "financial_qa": {"error": "DeepSeek Harness turn ended with max-tokens"},
+        "surface_blocks": [], "thread_context_patch": {},
+    })
+    web._run_custom_tool_stream_payload({
+        "run_id": "finance_incomplete", "text": "查询资金流", "thread_id": 101,
+        "guest_identity": {"user_id": "user_a"},
+    }, emit=emitted.append)
+    assert conversations.completed[0]["status"] == "failed"
+    done = next(event for event in emitted if event.get("event") == "done")
+    assert done["message"] == "任务未完成"
+
+
 def test_natural_language_tool_development_starts_a_first_round_when_no_tool_is_active(monkeypatch) -> None:
     class _FirstRoundAgent:
         def __init__(self) -> None:
