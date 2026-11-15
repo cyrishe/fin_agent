@@ -251,6 +251,8 @@ class FinancialQaCcService:
             if isinstance(raw_allowed_skills, list)
             else None
         )
+        allowed_agent_tools = []
+        allowed_finance_skills = ["equity-report-analysis"]
         # Skill ownership uses the authenticated user, not legacy Tool thread aliases.
         registry_error = ""
         catalog = self.business_skill_catalog

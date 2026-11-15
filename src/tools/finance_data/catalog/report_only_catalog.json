@@ -1,0 +1,439 @@
+{
+  "version": "2026-09-30-technical-history-v1",
+  "filter_syntax": "filter 为条件表达式字符串，支持以下写法：比较 == != > >= < <=；组合 and/or 与括号；文本包含 field.contains('文本')（单个文本字面量，大小写敏感）；集合 field in [...] / field not in [...]，列表也可用 rN.column 或 stepN.column；空值 field is None / field is not None。字段取自当前方法，值使用带引号的文本、数字、True/False 或 None。",
+  "api_class_patterns": {
+    "report_query": {
+      "desc": "查询逐篇研报的评级、目标价、观点、风险和来源。",
+      "call_pattern": "r{id} = stock.report.query(filter, order, limit) -> field1, field2",
+      "output_rule": "每行一篇研报；输出当前研报字段。",
+      "args": {
+        "required": [],
+        "optional": [
+          "filter",
+          "order",
+          "limit"
+        ]
+      },
+      "rules": []
+    },
+    "report_aggregate": {
+      "desc": "聚合研报数量、评级或目标价，支持按公司统计。",
+      "call_pattern": "r{id} = stock.report.agg(filter, agg, group_by, order, limit) -> group_fields, aggregate_expression as alias",
+      "output_rule": "输出 group_by 字段和一个聚合表达式 as 别名；省略 group_by 时返回整体统计。",
+      "args": {
+        "required": [
+          "agg"
+        ],
+        "optional": [
+          "filter",
+          "group_by",
+          "order",
+          "limit"
+        ]
+      },
+      "rules": [
+        "agg 使用 method(field)，字段与方法从当前 aggregate_fields 选择；每次调用计算一个聚合目标。",
+        "filter 筛选研报行，group_by 分组，order/limit 作用于聚合结果；统计单位为每条匹配研报记录。"
+      ],
+      "methods": [
+        "sum",
+        "max",
+        "min",
+        "avg",
+        "median",
+        "count"
+      ]
+    },
+    "report_metric_query": {
+      "desc": "查询逐机构、逐公司、逐年度的研报标准指标事实。",
+      "call_pattern": "r{id} = stock.report_metric.query(filter, order, limit) -> field1, field2",
+      "output_rule": "每行一个研报指标事实；输出当前指标字段。",
+      "args": {
+        "required": [],
+        "optional": [
+          "filter",
+          "order",
+          "limit"
+        ]
+      },
+      "rules": []
+    },
+    "report_metric_aggregate": {
+      "desc": "聚合研报标准指标事实，支持按公司、机构或年度统计。",
+      "call_pattern": "r{id} = stock.report_metric.agg(filter, agg, group_by, order, limit) -> group_fields, aggregate_expression as alias",
+      "output_rule": "输出 group_by 字段和一个聚合表达式 as 别名；省略 group_by 时返回整体统计。",
+      "args": {
+        "required": [
+          "agg"
+        ],
+        "optional": [
+          "filter",
+          "group_by",
+          "order",
+          "limit"
+        ]
+      },
+      "rules": [
+        "agg 使用 method(field)，字段与方法从当前 aggregate_fields 选择；每次调用计算一个聚合目标。",
+        "filter 筛选指标事实，group_by 分组，order/limit 作用于聚合结果。",
+        "聚合 metric_value 时筛选单一 metric_code，或将 metric_code 纳入 group_by。"
+      ],
+      "methods": [
+        "sum",
+        "max",
+        "min",
+        "avg",
+        "median",
+        "count"
+      ]
+    }
+  },
+  "subjects": {
+    "stock": {
+      "_meta": {
+        "public_name": "股票",
+        "desc": "股票研报及研报预测指标。",
+        "rules": []
+      },
+      "report": {
+        "public_name": "研报明细",
+        "desc": "逐篇机构研报的评级与变动、目标价、核心观点、风险和来源；核心观点提供增长催化、业绩驱动、竞争格局与市场份额、竞争优势及战略展望的分析依据。",
+        "fields": {
+          "report_id": [
+            "研报ID",
+            "报告ID"
+          ],
+          "code": [
+            "股票代码",
+            "证券代码",
+            "code"
+          ],
+          "name": [
+            "股票名称",
+            "证券名称",
+            "name"
+          ],
+          "market": [
+            "市场"
+          ],
+          "title": [
+            "研报标题",
+            "标题"
+          ],
+          "report_date": [
+            "研报发布日期",
+            "报告发布日期",
+            "发布日期"
+          ],
+          "publisher": [
+            "发布方"
+          ],
+          "institution": [
+            "研究机构",
+            "机构"
+          ],
+          "analyst": [
+            "首位分析师",
+            "研究员"
+          ],
+          "analysts": [
+            "分析师列表",
+            "研究员列表"
+          ],
+          "industry": [
+            "研报行业",
+            "行业"
+          ],
+          "rating": [
+            "评级",
+            "投资评级"
+          ],
+          "rating_change": [
+            "评级变动",
+            "变动"
+          ],
+          "change_reason": [
+            "评级变动原因",
+            "变动原因"
+          ],
+          "investment_highlights": {
+            "aliases": [
+              "投资要点",
+              "核心观点"
+            ],
+            "desc": "机构投资逻辑与判断依据，包括增长催化、竞争优势和经营展望。"
+          },
+          "risk_warnings": [
+            "风险提示",
+            "风险"
+          ],
+          "target_price_lower": [
+            "目标价下限",
+            "预测最低价"
+          ],
+          "target_price_upper": [
+            "目标价上限",
+            "预测最高价"
+          ],
+          "target_price_lower_raw": [
+            "目标价下限原文"
+          ],
+          "target_price_upper_raw": [
+            "目标价上限原文"
+          ],
+          "target_price_horizon": [
+            "目标价期限"
+          ],
+          "target_price_horizon_start_date": [
+            "目标价期限开始日期"
+          ],
+          "target_price_horizon_end_date": [
+            "目标价期限结束日期"
+          ],
+          "source_system": [
+            "来源系统"
+          ],
+          "source_doc_id": [
+            "来源文档ID"
+          ],
+          "file_hash": [
+            "文件哈希"
+          ],
+          "file_name": [
+            "文件名"
+          ],
+          "created_at": [
+            "入库时间"
+          ],
+          "updated_at": [
+            "更新时间"
+          ]
+        },
+        "aggregate_fields": {
+          "report_id": [
+            "count"
+          ],
+          "report_date": [
+            "min",
+            "max",
+            "count"
+          ],
+          "institution": [
+            "count"
+          ],
+          "rating": [
+            "count"
+          ],
+          "target_price_lower": [
+            "sum",
+            "avg",
+            "min",
+            "max",
+            "median",
+            "count"
+          ],
+          "target_price_upper": [
+            "sum",
+            "avg",
+            "min",
+            "max",
+            "median",
+            "count"
+          ]
+        },
+        "api": [
+          {
+            "api_name": "stock.report.query",
+            "api_function": "查询逐篇研报的评级、目标价、核心观点、风险与来源；investment_highlights 提供机构判断的理由与催化因素。",
+            "api_class": "report_query",
+            "guidance": [
+              "limit=-1 返回全部匹配研报，受安全上限保护，超限返回错误。"
+            ],
+            "examples": [
+              "r1 = stock.report.query(filter = \"(code == '300750.SZ') and (report_date >= '2026-01-01') and (report_date <= '2026-07-28')\", order = \"report_date desc\", limit = 10) -> code, name, report_date, institution, rating, investment_highlights, risk_warnings",
+              "r2 = stock.report.query(filter = \"(code in r1.code) and (report_date >= '2025-01-01')\", order = \"report_date desc\", limit = 20) -> report_id, code, name, title, report_date, institution, analysts, rating, target_price_lower, target_price_upper"
+            ]
+          },
+          {
+            "api_name": "stock.report.agg",
+            "api_function": "统计匹配研报的数量、日期或目标价，支持按公司、机构及评级分组。",
+            "api_class": "report_aggregate",
+            "examples": [
+              "r1 = stock.report.agg(filter = \"report_date >= '2026-01-01'\", agg = count(stock.report.report_id), group_by = \"code, name, rating\", order = \"report_count desc\", limit = 50) -> code, name, rating, count(stock.report.report_id) as report_count",
+              "r2 = stock.report.agg(filter = \"(code == '300750.SZ') and (report_date >= '2025-01-01')\", agg = median(stock.report.target_price_upper)) -> median(stock.report.target_price_upper) as median_target_price_upper"
+            ]
+          }
+        ],
+        "rules": [
+          "report_date 为研报发布日期，按自然日期选择范围。",
+          "目标价数值字段返回可解析数值，原文由 target_price_lower_raw/target_price_upper_raw 提供。"
+        ]
+      },
+      "report_metric": {
+        "public_name": "研报预测指标",
+        "desc": "研报标准年度指标事实，按公司、机构、年份和值类型查询 EPS、归母净利润及增速、营业收入及增速、PE、PB、ROE。",
+        "fields": {
+          "report_id": [
+            "研报ID",
+            "报告ID"
+          ],
+          "company_id": [
+            "抽取公司ID",
+            "公司内部ID"
+          ],
+          "code": [
+            "股票代码",
+            "证券代码",
+            "code"
+          ],
+          "name": [
+            "股票名称",
+            "证券名称",
+            "name"
+          ],
+          "market": [
+            "市场"
+          ],
+          "title": [
+            "研报标题",
+            "标题"
+          ],
+          "report_date": [
+            "研报发布日期",
+            "报告发布日期",
+            "发布日期"
+          ],
+          "institution": [
+            "研究机构",
+            "机构"
+          ],
+          "analyst": [
+            "首位分析师",
+            "研究员"
+          ],
+          "analysts": [
+            "分析师列表",
+            "研究员列表"
+          ],
+          "rating": [
+            "评级",
+            "投资评级"
+          ],
+          "metric_code": [
+            "指标编码",
+            "metric_code"
+          ],
+          "metric_name": [
+            "指标名称",
+            "metric_name"
+          ],
+          "forecast_year": [
+            "指标年份",
+            "预测年份",
+            "预测年度"
+          ],
+          "value_type": [
+            "数值类型",
+            "实际值或预测值"
+          ],
+          "metric_value": [
+            "指标数值",
+            "预测值"
+          ],
+          "metric_value_raw": [
+            "指标数值原文"
+          ],
+          "unit_code": [
+            "单位编码"
+          ],
+          "unit": [
+            "标准单位",
+            "单位名称"
+          ],
+          "unit_raw": [
+            "单位原文"
+          ],
+          "source_locator": [
+            "来源定位"
+          ],
+          "reliable": [
+            "抽取冲突标记",
+            "可靠标记"
+          ],
+          "conflict_detail": [
+            "冲突证据详情"
+          ],
+          "created_at": [
+            "抽取时间"
+          ]
+        },
+        "aggregate_fields": {
+          "report_id": [
+            "count"
+          ],
+          "report_date": [
+            "min",
+            "max",
+            "count"
+          ],
+          "forecast_year": [
+            "min",
+            "max",
+            "count"
+          ],
+          "metric_value": [
+            "sum",
+            "avg",
+            "min",
+            "max",
+            "median",
+            "count"
+          ]
+        },
+        "value_domains": {
+          "metric_code": {
+            "eps": "每股收益",
+            "np_parent": "归母净利润",
+            "np_parent_growth": "归母净利润增长率",
+            "pb": "市净率",
+            "pe": "市盈率",
+            "revenue": "营业收入",
+            "revenue_growth": "营业收入增长率",
+            "roe": "净资产收益率"
+          },
+          "value_type": {
+            "forecast": "预测值",
+            "actual": "实际值"
+          }
+        },
+        "api": [
+          {
+            "api_name": "stock.report_metric.query",
+            "api_function": "查询逐机构、逐公司、逐年度的原始指标值，供明细对比与排序。",
+            "api_class": "report_metric_query",
+            "guidance": [
+              "limit=-1 返回全部匹配指标事实，受安全上限保护，超限返回错误。"
+            ],
+            "examples": [
+              "r1 = stock.report_metric.query(filter = \"(code == '300750.SZ') and (metric_code == 'eps') and (value_type == 'forecast') and (forecast_year >= 2026)\", order = \"forecast_year asc, report_date desc\", limit = 50) -> report_id, code, name, report_date, institution, metric_code, metric_name, forecast_year, metric_value, unit, source_locator",
+              "r2 = stock.report_metric.query(filter = \"(institution == '中金公司') and (name == '海尔智家') and (metric_code == 'np_parent') and (forecast_year == 2027) and (value_type == 'forecast')\", order = \"report_date desc\", limit = 10) -> report_id, code, name, institution, report_date, forecast_year, metric_value, unit, reliable, source_locator"
+            ]
+          },
+          {
+            "api_name": "stock.report_metric.agg",
+            "api_function": "统计匹配研报指标事实，支持按公司、机构及年度分组。",
+            "api_class": "report_metric_aggregate",
+            "examples": [
+              "r1 = stock.report_metric.agg(filter = \"(metric_code == 'eps') and (value_type == 'forecast') and (forecast_year >= 2026) and (report_date >= '2025-01-01')\", agg = avg(stock.report_metric.metric_value), group_by = \"code, name, forecast_year, metric_code, unit\", order = \"avg_eps desc\", limit = 50) -> code, name, forecast_year, metric_code, unit, avg(stock.report_metric.metric_value) as avg_eps",
+              "r2 = stock.report_metric.agg(filter = \"(code == '300750.SZ') and (metric_code == 'revenue') and (value_type == 'forecast')\", agg = median(stock.report_metric.metric_value), group_by = \"forecast_year, metric_code, unit\", order = \"forecast_year asc\") -> forecast_year, metric_code, unit, median(stock.report_metric.metric_value) as median_revenue"
+            ]
+          }
+        ],
+        "rules": [
+          "metric_code 与 value_type 从 value_domains 选择；forecast_year 为指标年度，report_date 为研报发布日期。",
+          "code 为证券标识；reliable 记录抽取冲突，source_locator、metric_value_raw、conflict_detail 提供核验依据。"
+        ]
+      }
+    }
+  }
+}

@@ -47,8 +47,8 @@ def test_discovery_is_authorized_body_free_and_matches_mcp_schema(api):
     listing = mcp(client, "list_skills")["structuredContent"]
     rest = client.get("/v1/skills", headers={"X-API-Key": KEY_A}).json()
     assert rest == listing
-    personal = next(x for x in listing["skills"] if x["id"] == "personal-report")
-    assert personal["active_revision_no"] == 1
+    personal = next(x for x in listing["skills"] if x["id"] == "equity-report-analysis")
+    assert {x["id"] for x in listing["skills"]} == {"equity-report-analysis"}
     assert len(listing["revision"]) == 64
     assert "PRIVATE_METHOD_BODY" not in json.dumps(listing)
     assert "PRIVATE_REFERENCE" not in json.dumps(listing)
@@ -77,8 +77,8 @@ def test_generic_task_leaves_selection_to_existing_agent(api, selection):
     context = call["context"]
     assert call["user_text"] == "分析盈利质量"
     assert context["_finance_explicit_skill_ids"] == []
-    assert "personal-report" in context["_finance_skill_snapshot"]["skills"]
-    assert "personal-report" in context["_finance_skill_catalog_prompt"]
+    assert set(context["_finance_skill_snapshot"]["skills"]) == {"equity-report-analysis"}
+    assert "equity-report-analysis" in context["_finance_skill_catalog_prompt"]
     assert context["_finance_execution_mode"] == "standard"
     assert context["_finance_isolated_request"] is True
     assert call["owner_id"] == "alice"
@@ -86,22 +86,22 @@ def test_generic_task_leaves_selection_to_existing_agent(api, selection):
 
 def test_explicit_order_normalization_shared_data_and_rest_equivalence(api):
     client, session, _ = api
-    selection = [" personal-report ", "earnings-analysis", "personal-report"]
+    selection = [" equity-report-analysis ", "equity-report-analysis"]
     body = {"query": "分析盈利质量", "skill_ids": selection, "detail": True}
     result = mcp(client, "finance_task", body)
     assert not result["isError"]
     context = session.calls[-1]["context"]
-    assert context["_finance_explicit_skill_ids"] == ["personal-report", "earnings-analysis"]
-    assert context["_finance_explicit_skill_prompt"].index("personal-report") < context["_finance_explicit_skill_prompt"].index("earnings-analysis")
+    assert context["_finance_explicit_skill_ids"] == ["equity-report-analysis"]
+    assert "equity-report-analysis" in context["_finance_explicit_skill_prompt"]
     assert context["_finance_data_only"] is False
-    assert context["allowed_agent_tools"] == ["stock_kline_visual_analysis"]  # System finance grant; no web/custom tools.
+    assert context["allowed_agent_tools"] == []
     assert result["structuredContent"]["data"] is not None
     assert result["structuredContent"]["detail"]["skill_catalog_revision"] == context["_finance_skill_catalog_revision"]
     assert "PRIVATE_METHOD_BODY" not in json.dumps(result)
     for path in ("/v1/finance/task", "/v1/finance/answer"):
         response = client.post(path, headers={"X-API-Key": KEY_A}, json=body)
         assert response.status_code == 200
-        assert session.calls[-1]["context"]["_finance_explicit_skill_ids"] == ["personal-report", "earnings-analysis"]
+        assert session.calls[-1]["context"]["_finance_explicit_skill_ids"] == ["equity-report-analysis"]
 
 
 @pytest.mark.parametrize("name", ["personal-report", "does-not-exist"])
@@ -135,16 +135,12 @@ def test_body_cannot_supply_owner_or_access_private_methods(api):
     assert not session.calls
 
 
-def test_publication_visibility_changes_apply_to_discovery_and_execution(api, hub):
+def test_published_personal_skill_remains_unavailable(api, hub):
     client, session, _ = api
     hub.set_visibility("personal-report", owner_id="alice", visibility="public", expected_active_revision=1)
-    assert "personal-report" in {s["id"] for s in mcp(client, "list_skills", key=KEY_B)["structuredContent"]["skills"]}
-    body = {"query": "分析", "skill_ids": ["personal-report"]}
-    assert not mcp(client, "finance_task", body, key=KEY_B)["isError"]
-    assert session.calls[-1]["owner_id"] == "finance-api:client-b"
-    hub.set_visibility("personal-report", owner_id="alice", visibility="private", expected_active_revision=1)
-    assert mcp(client, "finance_task", body, key=KEY_B)["isError"]
-    assert len(session.calls) == 1
+    assert "personal-report" not in {s["id"] for s in mcp(client, "list_skills", key=KEY_B)["structuredContent"]["skills"]}
+    assert mcp(client, "finance_task", {"query": "分析", "skill_ids": ["personal-report"]}, key=KEY_B)["isError"]
+    assert not session.calls
 
 
 def test_registry_failure_falls_back_to_system_without_private_authorization(api, hub, monkeypatch):
@@ -156,7 +152,7 @@ def test_registry_failure_falls_back_to_system_without_private_authorization(api
     assert listing["note"]
     assert "personal-report" not in {s["id"] for s in listing["skills"]}
     assert "INTERNAL_DATABASE_LOCATION" not in json.dumps(listing)
-    assert not mcp(client, "finance_task", {"query": "分析", "skill_ids": ["earnings-analysis"]})["isError"]
+    assert not mcp(client, "finance_task", {"query": "分析", "skill_ids": ["equity-report-analysis"]})["isError"]
     assert mcp(client, "finance_task", {"query": "分析", "skill_ids": ["personal-report"]})["isError"]
     assert len(session.calls) == 1
 
@@ -219,6 +215,6 @@ def test_default_gateway_wires_published_registry(monkeypatch):
     monkeypatch.setenv("FINANCE_API_OWNER_IDS_JSON", '{"client-a":"alice"}')
     monkeypatch.setattr(module, "FinancialQaCcService", engine)
     gateway = module.FinanceApiGateway()
-    assert seen["skill_hub_catalog_service"] is not None
+    assert "skill_hub_catalog_service" not in seen
     assert gateway.owner_id("client-a") == "alice"
     assert gateway.owner_id("client-b") == "finance-api:client-b"

@@ -93,7 +93,7 @@
   <main>
     <div class="hero">
       <strong>连接地址</strong>
-      <div class="endpoint">https://ai-agent.kingdomai.com/fin_agent/mcp</div>
+      <div class="endpoint">http://127.0.0.1:22100/mcp</div>
       <p class="lead">传输协议为 MCP Streamable HTTP。所有请求都需要 API Key，推荐使用 <code>Authorization: Bearer &lt;FINANCE_API_KEY&gt;</code> 请求头。</p>
     </div>
 
@@ -101,9 +101,9 @@
       <section>
         <h2>可用工具</h2>
         <ul>
-          <li><code>finance_task</code>：通用金融任务；只传问题自动选择 Skill 和数据工具，传 <code>skill_ids</code> 指定有序方法。</li>
+          <li><code>finance_task</code>：研报问答；只传问题自动选择研报方法和数据工具，也可通过 <code>skill_ids</code> 指定研报方法。</li>
           <li><code>list_skills</code>：发现当前身份可用的已发布 Skill ID、用途与版本。</li>
-          <li><code>finance_data_query</code>：直接查询行情、财务、估值、资金流、研报等结构化数据。</li>
+          <li><code>finance_data_query</code>：直接查询研报明细、观点和预测指标。</li>
           <li>这是封闭数据查询能力，不调用通用 Web Search。</li>
         </ul>
       </section>
@@ -143,7 +143,7 @@ import os
 from mcp import ClientSession
 from mcp.client.streamable_http import streamablehttp_client
 
-MCP_URL = "https://ai-agent.kingdomai.com/fin_agent/mcp"
+MCP_URL = "http://127.0.0.1:22100/mcp"
 HEADERS = {"Authorization": f"Bearer {os.environ['FINANCE_API_KEY']}"}
 
 async def main():
@@ -153,7 +153,7 @@ async def main():
             result = await session.call_tool(
                 "finance_task",
                 arguments={
-                    "query": "海尔智家近四年的营业收入和归母净利润走势如何？",
+                    "query": "海尔智家最近有哪些研报，机构观点是什么？",
                     "response_mode": "both",
                     "runtime": "dsh",
                 },
@@ -164,15 +164,15 @@ async def main():
             skills = await session.call_tool("list_skills", arguments={})
             print(skills.structuredContent)
             result = await session.call_tool("finance_task", arguments={
-                "query": "分析海尔智家的盈利质量和估值，给出综合判断",
-                "skill_ids": ["earnings-analysis", "valuation-analysis"],
+                "query": "根据研报比较机构对海尔智家的盈利预测",
+                "skill_ids": ["equity-report-analysis"],
                 "response_mode": "both",
             })
             print(result.structuredContent)
 
 asyncio.run(main())</pre>
-        <p class="note">MCP 调用时需要指定入口工具名；调用 <code>finance_task</code> 后，内部方法与数据工具可由 Fin Agent 自动选择。多个 Skill 在同一次 Agent 任务中指导分析，未授权或未发布的方法会被拒绝。工具工坊自定义工具不在本接口范围内。</p>
-        <p class="note">返回值包含 <code>data_sources</code>、结构化结果、摘要和执行元数据。<code>data_sources</code> 使用“股票 · 研报明细”“行业 · 成分股”等公开业务名称，列出每个查询目标及实际记录数，便于核验查询逻辑；不会暴露内部目录路由标识。只需要裸数据时，将 <code>response_mode</code> 设为 <code>data</code>。</p>
+        <p class="note">MCP 调用时需要指定入口工具名；调用 <code>finance_task</code> 后，内部方法与数据工具可由 Fin Agent 自动选择。当前仅开放研报分析方法，其他方法会被拒绝。工具工坊自定义工具不在本接口范围内。</p>
+        <p class="note">返回值包含 <code>data_sources</code>、结构化结果、摘要和执行元数据。<code>data_sources</code> 使用“股票 · 研报明细”等公开业务名称，列出每个查询目标及实际记录数，便于核验查询逻辑；不会暴露内部目录路由标识。只需要裸数据时，将 <code>response_mode</code> 设为 <code>data</code>。</p>
       </section>
     </div>
   </main>

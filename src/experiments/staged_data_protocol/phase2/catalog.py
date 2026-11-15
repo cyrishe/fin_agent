@@ -15,7 +15,7 @@ CATALOG_PATH = (
     / "tools"
     / "finance_data"
     / "catalog"
-    / "api_view_catalog.json"
+    / "report_only_catalog.json"
 )
 
 # These aliases are compatibility inputs accepted by the execution protocol.

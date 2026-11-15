@@ -1713,9 +1713,9 @@ class FinanceDataQueryCcTools:
             finally:
                 call["duration_ms"] = round((time.monotonic() - started) * 1000, 3)
 
-        tools = [read_finance_catalog, finance_query, load_finance_result, resolve_security, run_backtest]
-        from src.services.user_task_agent_tools import build_user_task_agent_tools
-        tools.extend(build_user_task_agent_tools(tool_runtime))
+        # This deployment only exposes the report data workflow. Report rows
+        # themselves contain security names and codes; no identity table is required.
+        tools = [read_finance_catalog, finance_query, load_finance_result]
         fallback_snapshot = (
             self.business_skill_catalog.method_snapshot()
             if self.business_skill_catalog is not None else {"revision": "", "skills": {}}
@@ -1878,11 +1878,7 @@ class FinanceDataQueryCcTools:
             return _tool_result(payload)
 
         tools.append(read_finance_skill_reference)
-        configured_tool_names = [
-            _trim(item)
-            for item in tool_context.get("allowed_agent_tools") or []
-            if _trim(item)
-        ]
+        configured_tool_names = []
         configured_specs = (
             self.tool_adapter.list_tool_specs(configured_tool_names)
             if configured_tool_names

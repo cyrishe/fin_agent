@@ -212,6 +212,8 @@ def test_dsh_uses_canonical_llm_model_route(
     monkeypatch.setenv("TASK_SQLITE_PATH", str(tmp_path / "tasks.sqlite3"))
     monkeypatch.setenv("TASK_ARTIFACT_ROOT", str(tmp_path / "artifacts"))
     monkeypatch.setenv("SYSTEM_DB_URL", "")
+    monkeypatch.setenv("FINANCE_REPORT_DB_URL", "mysql://reader:secret@db/client")
+    monkeypatch.setenv("FINANCE_REPORT_TABLE", "client_reports")
     service = FinanceDeepSeekHarnessSessionService(
         enabled=False,
         root_dir=tmp_path / "runtime",
@@ -233,6 +235,8 @@ def test_dsh_uses_canonical_llm_model_route(
     assert captured[0]["env"]["LLM_DEFAULT_MODEL"] == "server-model"
     assert captured[0]["env"]["TASK_SQLITE_PATH"] == str(tmp_path / "tasks.sqlite3")
     assert captured[0]["env"]["SYSTEM_DB_URL"] == ""
+    assert captured[0]["env"]["FINANCE_REPORT_DB_URL"] == "mysql://reader:secret@db/client"
+    assert captured[0]["env"]["FINANCE_REPORT_TABLE"] == "client_reports"
     patch = Path("config/deepseek_harness/finance_query.patch.yml").read_text()
     for key in ("LLM_API_KEY", "LLM_BASE_URL", "LLM_DEFAULT_MODEL", "LLM_FLASH_MODEL", "LLM_REASONING_MODEL",
                 "TASK_SQLITE_PATH", "TASK_ARTIFACT_ROOT", "SYSTEM_DB_URL"):
@@ -619,18 +623,17 @@ def test_dsh_mcp_bridge_exposes_financial_data_and_skill_read_tools(tmp_path: Pa
         "load_finance_result",
         "read_finance_skill",
         "read_finance_skill_reference",
-        "resolve_security",
     }
     result = asyncio.run(
         bridge.call_tool(
             "read_finance_catalog",
-            {"subject": "stock", "dataview": "quote"},
+            {"subject": "stock", "dataview": "report"},
         )
     )
     trace = json.loads(trace_path.read_text(encoding="utf-8"))
 
     assert result["mode"] == "dataview"
-    assert result["dataview"]["name"] == "quote"
+    assert result["dataview"]["name"] == "report"
     assert trace["revision"] == "turn-1"
     assert trace["tracker"]["calls"][0]["tool"] == "read_finance_catalog"
 
@@ -1558,3 +1561,35 @@ def test_execution_timing_steps_uses_server_boundaries_and_omits_reasoning():
     assert spans[1]["duration_ms"] == 25
     assert spans[2]["duration_ms"] is None and spans[2]["usage"] is None
     assert "secret" not in str(spans) and "hidden" not in str(spans)
+
+
+def test_report_catalog_preload_is_turn_scoped_and_versioned(tmp_path, monkeypatch):
+    captured = []
+    class Harness:
+        def __init__(self, **kwargs):
+            self.env = kwargs['env']
+        def run(self, prompt, *, session_id, on_notification):
+            ctx = json.loads(Path(self.env['FIN_AGENT_DSH_CONTEXT_PATH']).read_text())
+            captured.append((prompt, ctx))
+            return SimpleNamespace(events=[], finish_reason='stop', final_response='完成')
+        def close(self):
+            pass
+    monkeypatch.setenv('FINANCE_DSH_REPORT_CATALOG_PRELOAD', '1')
+    service = FinanceDeepSeekHarnessSessionService(enabled=True, root_dir=tmp_path / 'runtime',
+        log_path=tmp_path / 'events', worker_count=1, harness_factory=Harness)
+    try:
+        service.run_turn(thread_id='a', owner_id='a', user_text='研报')
+        prompt, ctx = captured[-1]
+        preload = ctx['tool_context']['_finance_preloaded_catalog']
+        assert preload['revision'] == ctx['finance_catalog_revision']
+        assert set(preload['apis']) == {'stock.report.query', 'stock.report.agg',
+            'stock.report_metric.query', 'stock.report_metric.agg'}
+        assert all(api in prompt for api in preload['apis'])
+        service.run_turn(thread_id='b', owner_id='a', user_text='仅取数',
+                         context={'_finance_data_only': True})
+        assert '_finance_preloaded_catalog' not in captured[-1][1]['tool_context']
+        monkeypatch.setenv('FINANCE_DSH_REPORT_CATALOG_PRELOAD', '0')
+        service.run_turn(thread_id='c', owner_id='a', user_text='研报')
+        assert '_finance_preloaded_catalog' not in captured[-1][1]['tool_context']
+    finally:
+        service.close()

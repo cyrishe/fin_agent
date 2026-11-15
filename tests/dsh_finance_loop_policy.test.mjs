@@ -1891,3 +1891,23 @@ test('remaining budget is refreshed even when successive successful queries keep
     assert.match(next.messages.at(-1).content[0].text, new RegExp(`查询 ${remaining}/4`))
   }
 })
+
+test('preloaded catalog authorizes only matching revision in standard mode', async t => {
+  const dir = mkdtempSync(join(tmpdir(), 'finance-preloaded-'))
+  const path = join(dir, 'context.json')
+  const previous = process.env.FIN_AGENT_DSH_CONTEXT_PATH
+  process.env.FIN_AGENT_DSH_CONTEXT_PATH = path
+  t.after(() => { if (previous === undefined) delete process.env.FIN_AGENT_DSH_CONTEXT_PATH; else process.env.FIN_AGENT_DSH_CONTEXT_PATH = previous; rmSync(dir, { recursive: true, force: true }) })
+  const context = revision => ({ finance_catalog_revision: revision, tool_context: {
+    _finance_preloaded_catalog: { revision: 'v1', apis: ['stock.report.query', 'stock.report.agg'] },
+  } })
+  writeFileSync(path, JSON.stringify(context('v1')))
+  const runtime = fixture({ preserveRequestPrefix: true })
+  runtime.event({ type: 'turn/start', data: { turn: 1 } })
+  await runtime.preStep({ step: 1 })
+  assert.equal(runtime.guard({ name: NAMES.query, arguments: { request: 'r1 = stock.report.query() -> report_id' } }), undefined)
+  assert.match(runtime.guard({ name: NAMES.query, arguments: { request: 'r1 = stock.quote.query() -> code' } }), /stock.quote.query/)
+  writeFileSync(path, JSON.stringify(context('v2')))
+  await runtime.preStep({ step: 2 })
+  assert.match(runtime.guard({ name: NAMES.query, arguments: { request: 'r1 = stock.report.query() -> report_id' } }), /stock.report.query/)
+})

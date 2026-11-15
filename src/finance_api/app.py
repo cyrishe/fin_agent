@@ -55,6 +55,7 @@ from src.services.request_usage_service import DailyUsageService
 from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
 )
+from src.experiments.staged_data_protocol.phase2.report_provider import configured_report_tables
 
 
 # The standalone process follows the main application convention: deployment
@@ -69,16 +70,14 @@ _CURRENT_PRINCIPAL: contextvars.ContextVar[FinanceApiPrincipal | None] = (
 
 FINANCE_TOOL_NAME = "finance_data_query"
 FINANCE_TOOL_DESCRIPTION = (
-    "查询 Fin Agent 的结构化金融证券数据。适用于股票、指数、行业、板块、基金、债券和市场热点，"
-    "以及行情、资金流、估值、财务三表、业绩预告、业务分部、股东、质押、公司行动、指数/行业/"
-    "板块成分、研报观点和研报年度预测指标等问题。输入自然语言问题；response_mode=data 返回"
+    "查询结构化研报观点、评级、目标价及年度预测指标。输入自然语言问题；response_mode=data 返回"
     "结构化原始数据，summary 返回基于数据的中文结论，both 同时返回两者。返回中的 data_sources "
     "会用公开业务名称说明实际查询的数据对象、数据类型、查询目标和记录数，便于核验与溯源。"
     "detail=true 另附轮数、逐步 Token、耗时与查询检查记录。"
     "默认每次调用独立；仅显式传入 conversation_id 时续接该用户的会话上下文。"
 )
 FINANCE_TASK_DESCRIPTION = (
-    "通用金融任务入口。提交自然语言问题，Fin Agent 自动选择合适的已授权金融 Skill 和金融数据工具，"
+    "研报问答入口。提交自然语言问题，Fin Agent 使用研报分析方法和研报数据工具，"
     "完成取证与分析并返回综合结论。需要指定方法时，先用 list_skills 发现可用 ID，再传 skill_ids；"
     "多个 Skill 按传入顺序指导分析、共享基础数据、综合输出。省略 skill_ids 则自动选择。"
     "response_mode=both 同时返回结论与参考数据，summary 只返回结论，data 只返回数据。"
@@ -144,6 +143,7 @@ def create_app(
     gateway: FinanceApiGateway | None = None,
     catalog: FinanceDataToolCatalogService | None = None,
 ) -> FastAPI:
+    configured_report_tables()
     key_auth = auth or FinanceApiKeyAuth.from_env()
     catalog_service = catalog or FinanceDataToolCatalogService()
     gateway_holder: dict[str, FinanceApiGateway | None] = {"value": gateway}
@@ -342,8 +342,7 @@ def create_app(
                 logger.warning("Finance DSH prewarm failed: %s", exc)
         async with mcp.session_manager.run():
             monitor_task = None
-            if owns_gateway and os.environ.get("FINANCE_STATUS_ENABLED", "1") == "1":
-                monitor_task = asyncio.create_task(data_monitor.run())
+            # The general market-data monitor depends on non-report databases.
             try:
                 yield
             finally:

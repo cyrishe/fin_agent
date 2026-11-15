@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -17,8 +18,7 @@ from src.scenarios.financial_qa.empty_result import empty_result_context
 
 _EXPOSED_TOOLS = frozenset(
     {"read_finance_catalog", "finance_query", "load_finance_result",
-     "read_finance_skill", "read_finance_skill_reference", "resolve_security", "general_search", "stock_kline_visual_analysis",
-     "task_submit", "task_get", "task_list", "task_cancel"}
+     "read_finance_skill", "read_finance_skill_reference"}
 )
 _REQUIRED_TOOLS = frozenset(
     {"read_finance_catalog", "finance_query", "load_finance_result"}
@@ -255,6 +255,9 @@ def create_server(bridge: FinanceDshMcpBridge) -> Server:
 
 
 async def _run() -> None:
+    source = os.environ.get("KINGDOMAI_DB_CREDENTIAL_SOURCE", "")
+    if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", source):
+        os.environ[source] = os.environ.get("FINANCE_REPORT_CREDENTIAL_SOURCE_URL", "")
     context_path = Path(os.environ["FIN_AGENT_DSH_CONTEXT_PATH"]).resolve()
     trace_path = Path(os.environ["FIN_AGENT_DSH_TRACE_PATH"]).resolve()
     bridge = FinanceDshMcpBridge(

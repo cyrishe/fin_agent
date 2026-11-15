@@ -20,7 +20,6 @@ from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
 )
 from src.services.request_usage_service import record_request, total_tokens
-from src.services.skill_hub_catalog_service import SkillHubCatalogService
 from src.services.skill_candidate_store_service import SkillCandidateStoreError
 
 
@@ -56,8 +55,10 @@ class FinanceApiGateway:
         ):
             raise ValueError("FINANCE_API_OWNER_IDS_JSON must map principal IDs to nonblank owner IDs")
         self._principal_owner_ids = {key.strip(): value.strip() for key, value in bindings.items()}
-        self.engine = engine or FinancialQaCcService(skill_hub_catalog_service=SkillHubCatalogService())
-        self.usage_recorder = usage_recorder or (record_request if engine is None else None)
+        self.engine = engine or FinancialQaCcService()
+        self.usage_recorder = usage_recorder or (
+            record_request if engine is None and os.environ.get("FINANCE_API_USAGE_ENABLED") == "1" else None
+        )
         self.default_runtime = normalize_financial_qa_runtime(
             default_runtime
             or os.environ.get("FINANCE_API_DEFAULT_RUNTIME")
@@ -92,6 +93,8 @@ class FinanceApiGateway:
         snapshot = catalog.discovery_snapshot()
         skills = []
         for entry in snapshot["entries"]:
+            if entry["id"] != "equity-report-analysis":
+                continue
             detail = catalog.studio_detail(entry["id"]) or {}
             skills.append({
                 "id": entry["id"],
@@ -167,7 +170,7 @@ class FinanceApiGateway:
             # Server-owned financial capability grant, shared by REST and MCP.
             # Skill selection cannot grant web search or private/custom tools.
             application_context={"default_agent": {"name": "investment_analyst",
-                "runtime_profile": {"tools": ["stock_kline_visual_analysis"]}}},
+                "runtime_profile": {"tools": [], "skills": ["equity-report-analysis"]}}},
             dispatch_plan={
                 "selected_agent": "investment_analyst",
                 "turn_mode": "normal_qa",

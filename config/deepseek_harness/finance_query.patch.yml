@@ -42,6 +42,19 @@
           TASK_SQLITE_PATH: !!js process.env.TASK_SQLITE_PATH
           TASK_ARTIFACT_ROOT: !!js process.env.TASK_ARTIFACT_ROOT
           SYSTEM_DB_URL: !!js process.env.SYSTEM_DB_URL
+          FINANCE_REPORT_DB_URL: !!js process.env.FINANCE_REPORT_DB_URL
+          FINANCE_REPORT_DB_NAME: !!js process.env.FINANCE_REPORT_DB_NAME
+          FINANCE_REPORT_TABLE: !!js process.env.FINANCE_REPORT_TABLE
+          FINANCE_REPORT_METRIC_FACT_TABLE: !!js process.env.FINANCE_REPORT_METRIC_FACT_TABLE
+          FINANCE_REPORT_METRIC_DEF_TABLE: !!js process.env.FINANCE_REPORT_METRIC_DEF_TABLE
+          KINGDOMAI_DB_HOST: !!js process.env.KINGDOMAI_DB_HOST
+          KINGDOMAI_DB_PORT: !!js process.env.KINGDOMAI_DB_PORT
+          KINGDOMAI_DB_USER: !!js process.env.KINGDOMAI_DB_USER
+          KINGDOMAI_DB_PASSWORD: !!js process.env.KINGDOMAI_DB_PASSWORD
+          KINGDOMAI_DB_URL: !!js process.env.KINGDOMAI_DB_URL
+          KINGDOMAI_DB_CREDENTIAL_SOURCE: !!js process.env.KINGDOMAI_DB_CREDENTIAL_SOURCE
+          FINANCE_REPORT_CREDENTIAL_SOURCE_URL: !!js process.env.FINANCE_REPORT_CREDENTIAL_SOURCE_URL
+          BUSINESS_DB_URL: !!js process.env.BUSINESS_DB_URL
         toolCallTimeoutMs: 180000
         failOnStartupError: true
         reconnect:

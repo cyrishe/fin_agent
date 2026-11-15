@@ -17,8 +17,8 @@ class _Engine:
     def answer(self, **kwargs: Any) -> dict[str, Any]:
         self.calls.append(kwargs)
         return {
-            "summary": "贵州茅台最近三条行情已经取得。",
-            "message": "贵州茅台最近三条行情已经取得。",
+            "summary": "贵州茅台最近三条研报已经取得。",
+            "message": "贵州茅台最近三条研报已经取得。",
             "model_name": "deepseek-v4-flash",
             "financial_qa": {
                 "duration_ms": 1234,
@@ -26,7 +26,7 @@ class _Engine:
                 "tool_calls": [{"tool": "finance_query"}],
                 "result_refs": [
                     {
-                        "api": "stock.quote",
+                        "api": "stock.report",
                         "row_count": 3,
                         "result_ref": "dataref_should_not_be_public",
                     }
@@ -38,16 +38,16 @@ class _Engine:
                 "results": [
                     {
                         "result_name": "r1",
-                        "goal": "查询行情",
-                        "api": "stock.quote",
+                        "goal": "查询研报",
+                        "api": "stock.report",
                         "data_type": "table",
-                        "schema": {"columns": [{"name": "close"}]},
+                        "schema": {"columns": [{"name": "rating"}]},
                         "row_count": 3,
                         "result_ref": "dataref_should_not_be_public",
                         "rows": [
-                            {"close": 1},
-                            {"close": 2},
-                            {"close": 3},
+                            {"rating": 1},
+                            {"rating": 2},
+                            {"rating": 3},
                         ],
                     }
                 ],
@@ -68,7 +68,7 @@ def test_gateway_data_mode_returns_rows_without_summary_and_caps_output() -> Non
     response = asyncio.run(
         gateway.execute(
             FinanceQueryRequest(
-                query="贵州茅台最近行情",
+                query="贵州茅台最近研报",
                 response_mode="data",
                 execution_mode="fast",
                 max_rows=2,
@@ -82,11 +82,11 @@ def test_gateway_data_mode_returns_rows_without_summary_and_caps_output() -> Non
     assert response.execution_mode == "fast"
     assert response.summary is None
     assert response.data is not None
-    assert response.data.results[0].rows == [{"close": 1}, {"close": 2}]
-    assert response.data_sources[0].label == "股票 · 行情"
+    assert response.data.results[0].rows == [{"rating": 1}, {"rating": 2}]
+    assert response.data_sources[0].label == "股票 · 研报明细"
     assert response.data_sources[0].data_object == "股票"
-    assert response.data_sources[0].data_type == "行情"
-    assert response.data_sources[0].query_goal == "查询行情"
+    assert response.data_sources[0].data_type == "研报明细"
+    assert response.data_sources[0].query_goal == "查询研报"
     assert response.data_sources[0].row_count == 3
     assert response.data.results[0].truncated is True
     assert response.execution.truncated is True
@@ -108,7 +108,7 @@ def test_gateway_summary_mode_omits_structured_rows_and_isolates_principals() ->
     first = asyncio.run(
         gateway.execute(
             FinanceQueryRequest(
-                query="解释贵州茅台行情",
+                query="解释贵州茅台研报",
                 response_mode="summary",
                 conversation_id="same-public-id",
             ),
@@ -131,8 +131,8 @@ def test_gateway_summary_mode_omits_structured_rows_and_isolates_principals() ->
     assert first.execution.result_count == 1
     assert first.execution.total_rows == 3
     assert first.execution.returned_rows == 0
-    assert [item.label for item in first.data_sources] == ["股票 · 行情"]
-    assert "stock.quote" not in first.model_dump_json()
+    assert [item.label for item in first.data_sources] == ["股票 · 研报明细"]
+    assert "stock.report" not in first.model_dump_json()
     assert engine.calls[0]["data_only"] is False
     assert engine.calls[0]["include_response_data"] is False
     assert engine.calls[0]["response_data_max_rows"] == 100
@@ -155,13 +155,13 @@ def test_detail_is_opt_in_and_does_not_change_engine_request():
             raw["financial_qa"].update(assistant_message_count=2,
                 execution_steps=[{"kind": "llm", "duration_ms": 100, "usage": {"output_tokens": 30}}],
                 prompt_assets={"system_prompt": "not_public"})
-            raw["financial_qa"]["tool_calls"] = [{"tool": "finance_query", "api": "stock.quote", "api_execution_ms": 12,
-                "request": "stock.quote()", "result_ref": "not_public", "attempts": [{"duration_ms": 15}]}]
+            raw["financial_qa"]["tool_calls"] = [{"tool": "finance_query", "api": "stock.report", "api_execution_ms": 12,
+                "request": "stock.report()", "result_ref": "not_public", "attempts": [{"duration_ms": 15}]}]
             return raw
     engine = DetailedEngine()
     gateway = FinanceApiGateway(engine=engine)
-    plain = asyncio.run(gateway.execute(FinanceQueryRequest(query="行情", response_mode="data"), principal_id="a"))
-    rich = asyncio.run(gateway.execute(FinanceQueryRequest(query="行情", response_mode="data", detail=True), principal_id="a"))
+    plain = asyncio.run(gateway.execute(FinanceQueryRequest(query="研报", response_mode="data"), principal_id="a"))
+    rich = asyncio.run(gateway.execute(FinanceQueryRequest(query="研报", response_mode="data", detail=True), principal_id="a"))
     assert "detail" not in plain.model_dump()
     assert "detail" not in plain.model_dump_json()
     assert rich.detail["turns"] == 2
@@ -229,7 +229,7 @@ def test_context_is_independent_by_default_and_explicit_id_opts_into_continuity(
         for channel in ("mcp", "http_api"):
             for conversation_id in (None, None, "shared", "shared"):
                 response = await gateway.execute(
-                    FinanceQueryRequest(query="查询行情", conversation_id=conversation_id, response_mode="data"),
+                    FinanceQueryRequest(query="查询研报", conversation_id=conversation_id, response_mode="data"),
                     principal_id="same-user", request_channel=channel,
                 )
                 assert response.conversation_id == conversation_id

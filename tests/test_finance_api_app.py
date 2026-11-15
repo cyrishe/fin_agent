@@ -68,18 +68,14 @@ def test_public_health_catalog_and_data_map() -> None:
 
         catalog = client.get("/data-map/catalog.json")
         assert catalog.status_code == 200
-        assert catalog.json()["subject_count"] == 7
+        assert catalog.json()["subject_count"] == 1
         views = [view for subject in catalog.json()["subjects"] for view in subject["dataviews"]]
         assert catalog.json()["dataview_count"] == len(views)
-        assert {"technical", "technical_series"} <= {view["name"] for view in views}
+        assert {view["name"] for view in views} == {"report", "report_metric"}
         for subject in catalog.json()["subjects"]:
             for view in subject["dataviews"]:
                 assert len(view["fields"]) == view["field_count"]
                 assert all(field["name"] for field in view["fields"])
-        bond = next(subject for subject in catalog.json()["subjects"] if subject["name"] == "bond")
-        quote = next(view for view in bond["dataviews"] if view["name"] == "quote")
-        assert quote["public_name"] == "行情"
-        assert {"open", "close", "pct", "volumn"} <= {field["name"] for field in quote["fields"]}
 
         assert client.get("/v1/finance/catalog").status_code == 401
         protected_catalog = client.get(

@@ -5,10 +5,11 @@ from src.experiments.staged_data_protocol.phase2 import python_filter as pf
 import json
 import os
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Mapping
+from urllib.parse import unquote, urlparse
 
 import pymysql
 
@@ -231,12 +232,40 @@ REPORT_SOURCES = {
 }
 
 
+def configured_report_tables() -> tuple[str, str, str]:
+    """Resolve SQL identifiers from deployment configuration, never user input."""
+    tables = tuple(
+        str(os.environ.get(key) or default).strip()
+        for key, default in (
+            ("FINANCE_REPORT_TABLE", REPORT_TABLE),
+            ("FINANCE_REPORT_METRIC_FACT_TABLE", METRIC_FACT_TABLE),
+            ("FINANCE_REPORT_METRIC_DEF_TABLE", METRIC_DEF_TABLE),
+        )
+    )
+    if any(not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]{0,63}", name) for name in tables):
+        raise ValueError("研报表名必须是 1–64 位的 MySQL 简单标识符")
+    return tables
+
+
+def _configured_sources() -> dict[str, ReportSource]:
+    report, fact, definition = configured_report_tables()
+    return {
+        "report": replace(REPORT_SOURCE, from_sql=f"`{report}` r", tables=[report]),
+        "report_metric": replace(
+            METRIC_SOURCE,
+            from_sql=(f"`{fact}` m INNER JOIN `{report}` r ON r.id = m.report_id "
+                      f"LEFT JOIN `{definition}` d ON d.metric_id = m.metric_id"),
+            tables=[fact, report, definition],
+        ),
+    }
+
+
 def execute_report_api(*, args: Mapping[str, Any], outputs: List[str]) -> Dict[str, Any]:
-    return _execute_base_query(source=REPORT_SOURCE, args=args, outputs=outputs)
+    return _execute_base_query(source=_configured_sources()["report"], args=args, outputs=outputs)
 
 
 def execute_report_metric_api(*, args: Mapping[str, Any], outputs: List[str]) -> Dict[str, Any]:
-    return _execute_base_query(source=METRIC_SOURCE, args=args, outputs=outputs)
+    return _execute_base_query(source=_configured_sources()["report_metric"], args=args, outputs=outputs)
 
 
 def execute_report_agg_api(
@@ -245,7 +274,7 @@ def execute_report_agg_api(
     args: Mapping[str, Any],
     outputs: List[str],
 ) -> Dict[str, Any]:
-    source = REPORT_SOURCES.get(str(dataview or "").strip())
+    source = _configured_sources().get(str(dataview or "").strip())
     if not source:
         return {
             "status": "unsupported",
@@ -490,9 +519,17 @@ def _median_sql(
 
 
 def _connect_report_db() -> StockInfoDbUtils:
-    """Use the shared kingdomai connection contract used by other providers."""
-
-    return StockInfoDbUtils(database="kingdomai")
+    """Use an optional dedicated report connection, with legacy defaults."""
+    url = str(os.environ.get("FINANCE_REPORT_DB_URL") or "").strip()
+    if url:
+        parsed = urlparse(url.replace("mysql+pymysql://", "mysql://", 1))
+        database = unquote(parsed.path.lstrip("/"))
+        if parsed.scheme != "mysql" or not parsed.hostname or not parsed.username or not database or "/" in database:
+            raise ValueError("FINANCE_REPORT_DB_URL must be a MySQL URL with host, user and database")
+        return StockInfoDbUtils(host=parsed.hostname, port=parsed.port or 3306,
+                                user=unquote(parsed.username), password=unquote(parsed.password or ""),
+                                database=database)
+    return StockInfoDbUtils(database=str(os.environ.get("FINANCE_REPORT_DB_NAME") or "kingdomai"))
 
 
 def _run_query(*, sql: str, params: List[Any], recent_sql=None, required_rows=0) -> Dict[str, Any]:

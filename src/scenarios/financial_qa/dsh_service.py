@@ -741,6 +741,16 @@ class FinanceDeepSeekHarnessSessionService:
             "TASK_ARTIFACT_ROOT": os.environ.get("TASK_ARTIFACT_ROOT", ""),
             "SYSTEM_DB_URL": os.environ.get("SYSTEM_DB_URL", ""),
         }
+        for name in ("FINANCE_REPORT_DB_URL", "FINANCE_REPORT_DB_NAME",
+                     "FINANCE_REPORT_TABLE", "FINANCE_REPORT_METRIC_FACT_TABLE",
+                     "FINANCE_REPORT_METRIC_DEF_TABLE", "KINGDOMAI_DB_HOST",
+                     "KINGDOMAI_DB_PORT", "KINGDOMAI_DB_USER", "KINGDOMAI_DB_PASSWORD",
+                     "KINGDOMAI_DB_URL", "KINGDOMAI_DB_CREDENTIAL_SOURCE", "BUSINESS_DB_URL"):
+            env[name] = os.environ.get(name, "")
+        credential_source = env["KINGDOMAI_DB_CREDENTIAL_SOURCE"]
+        env["FINANCE_REPORT_CREDENTIAL_SOURCE_URL"] = ""
+        if credential_source and credential_source.isidentifier():
+            env["FINANCE_REPORT_CREDENTIAL_SOURCE_URL"] = os.environ.get(credential_source, "")
         source_root = _trim(os.environ.get("FINANCE_DSH_SOURCE_ROOT"))
         if source_root:
             env["FINANCE_DSH_SOURCE_ROOT"] = source_root
@@ -1015,6 +1025,22 @@ class FinanceDeepSeekHarnessSessionService:
             retain_affinity=not isolated_request,
         ) as (worker, queue_wait_ms):
             catalog_revision = self._catalog_revision()
+            if (_flag("FINANCE_DSH_REPORT_CATALOG_PRELOAD")
+                and tool_context["_finance_execution_mode"] == "standard"
+                and not tool_context["_finance_data_only"]):
+                catalog = self.system_tools.finance_catalog
+                packs = [catalog.get_model_dataview("stock", view)
+                         for view in ("report", "report_metric")]
+                if self._catalog_revision() != catalog_revision:
+                    raise RuntimeError("finance catalog changed while preparing the turn")
+                apis = [fn["api_name"] for pack in packs for fn in pack.get("functions", [])]
+                tool_context["_finance_preloaded_catalog"] = {
+                    "revision": catalog_revision, "apis": apis,
+                }
+                prompt += ("\n\n[本轮已加载的金融数据目录执行包]\n"
+                           + json.dumps(packs, ensure_ascii=False, separators=(",", ":"))
+                           + "\n以上为当前目录版本的执行契约，可直接调用 finance_query；"
+                             "需专业分析时仍可读取业务 Skill。")
             allowed_agent_tools = frozenset(
                 _trim(item) for item in tool_context.get("allowed_agent_tools") or []
                 if _trim(item)

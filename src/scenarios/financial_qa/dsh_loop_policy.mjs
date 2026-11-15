@@ -416,8 +416,12 @@ function visibleCatalogs(agent, tools) {
 }
 
 function reusableCatalogApis(agent, tools) {
-  return [...new Set(visibleCatalogs(agent, tools).flatMap(payload =>
-    payload.dataview.functions.map(fn => fn.api_name).filter(api => typeof api === 'string')))]
+  const preloaded = currentToolContext()._finance_preloaded_catalog
+  const revision = currentRuntimeContext().finance_catalog_revision
+  const initial = preloaded?.revision === revision && revision && Array.isArray(preloaded.apis)
+    ? preloaded.apis.filter(api => typeof api === 'string') : []
+  return [...new Set([...initial, ...visibleCatalogs(agent, tools).flatMap(payload =>
+    payload.dataview.functions.map(fn => fn.api_name).filter(api => typeof api === 'string'))])]
 }
 
 // Operation packs share field definitions. Keep every new contract and changed
