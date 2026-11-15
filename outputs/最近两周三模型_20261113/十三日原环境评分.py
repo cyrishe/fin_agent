@@ -1,0 +1,3 @@
+from pathlib import Path
+import json,joblib,pandas as pd,numpy as np
+P=Path(__file__).parent;R=P.parent.parent;F=R/'outputs/D0分时形态研究_20261113';long=json.loads((F/'远期字段.json').read_text());test=pd.read_pickle(P/'十三日双模型候选.pkl.gz');test=test.merge(pd.read_pickle(P/'十三日远期形态.pkl.gz')[['qdc_symbol','d0_date']+long],on=['qdc_symbol','d0_date'],how='left',validate='one_to_one');choice=json.loads((P/'十一月验证择优.json').read_text())['选定'];assert choice=='分时加远期模型';b=joblib.load(P/(choice+'.joblib'));test['六训二验']=b['model'].predict(test[b['features']].replace([np.inf,-np.inf],np.nan));test[['symbol','d0_date','六训二验']].to_pickle(P/'十三日原环境评分.pkl.gz',compression='gzip');print('评分',choice,len(test))

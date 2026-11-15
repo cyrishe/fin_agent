@@ -1,0 +1,104 @@
+{
+  "checks": [
+    {
+      "score_max_error": 4.440892098500626e-16,
+      "year": 2020,
+      "original_ids_verified": 642,
+      "added": 261,
+      "sold": 260,
+      "max_return_error_pctpoints": 5.684341886080802e-14,
+      "sales": 261,
+      "remaining_statuses": {
+        "全部卖出": 260,
+        "D1板价或除权异常": 1
+      }
+    },
+    {
+      "score_max_error": 6.661338147750939e-16,
+      "year": 2021,
+      "original_ids_verified": 762,
+      "added": 245,
+      "sold": 245,
+      "max_return_error_pctpoints": 1.4210854715202004e-14,
+      "sales": 303,
+      "remaining_statuses": {
+        "全部卖出": 245
+      }
+    },
+    {
+      "score_max_error": 6.661338147750939e-16,
+      "year": 2022,
+      "original_ids_verified": 746,
+      "added": 374,
+      "sold": 371,
+      "max_return_error_pctpoints": 1.1546319456101628e-14,
+      "sales": 430,
+      "remaining_statuses": {
+        "全部卖出": 371,
+        "D1开盘未知": 3
+      }
+    },
+    {
+      "score_max_error": 8.326672684688674e-16,
+      "year": 2023,
+      "original_ids_verified": 942,
+      "added": 371,
+      "sold": 371,
+      "max_return_error_pctpoints": 1.7763568394002505e-15,
+      "sales": 386,
+      "remaining_statuses": {
+        "全部卖出": 371
+      }
+    },
+    {
+      "score_max_error": 7.771561172376096e-16,
+      "year": 2024,
+      "original_ids_verified": 1071,
+      "added": 353,
+      "sold": 352,
+      "max_return_error_pctpoints": 2.220446049250313e-14,
+      "sales": 395,
+      "remaining_statuses": {
+        "全部卖出": 352,
+        "D1开盘未知": 1
+      }
+    },
+    {
+      "score_max_error": 3.3306690738754696e-16,
+      "year": 2025,
+      "original_ids_verified": 1090,
+      "added": 406,
+      "sold": 404,
+      "max_return_error_pctpoints": 1.7763568394002505e-15,
+      "sales": 405,
+      "remaining_statuses": {
+        "全部卖出": 404,
+        "D1开盘未知": 1,
+        "后续日线或分钟未知": 1
+      }
+    },
+    {
+      "score_max_error": 2.220446049250313e-16,
+      "year": 2026,
+      "original_ids_verified": 822,
+      "added": 334,
+      "sold": 331,
+      "max_return_error_pctpoints": 3.552713678800501e-15,
+      "sales": 348,
+      "remaining_statuses": {
+        "全部卖出": 331,
+        "后续日线或分钟未知": 2,
+        "D1开盘未知": 1
+      }
+    }
+  ],
+  "scripts_sha256": {
+    "scripts/research_three_f_risk_2020_20261114.py": "b2be5affc2f63224d93749ff2703a96b1c9da782d39b46ce66d525885e89309d",
+    "scripts/replay_three_f_cross_prepare_20261114.py": "df29ba150494186f93e2f6465936d149b151b0a36747cf3b58943f9fdfdd8893",
+    "scripts/replay_three_f_cross_requests_20261114.py": "565cdfb488d4f404d6daedbbeb075f609f6c1ebb005b0f9f1a4a522879d9c751",
+    "scripts/replay_three_f_cross_added_20261114.py": "aee78f9211dbf706b4cc14fbb167f05e02a8e2613876d102007542e4ceacd287",
+    "scripts/replay_three_f_cross_summary_20261114.py": "eae1564d486ce952547d8dd4cb45c96a8e53df91dfc6189709a0715ffd3d4140",
+    "scripts/replay_three_f_cross_diff_20261114.py": "9a58bb81f294187e429ecd4a80d4e07eaf7424ed5c5b4245a3511841e7850ae7",
+    "scripts/verify_three_f_cross_20261114.py": "63c752135bb0cba532570deeaca907821447066766db9f03c227751d502efff2"
+  }
+}

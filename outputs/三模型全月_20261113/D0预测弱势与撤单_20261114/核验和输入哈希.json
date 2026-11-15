@@ -1,0 +1,230 @@
+{
+  "portable_model_reload": [
+    {
+      "name": "全涨停池_F",
+      "year": 2021,
+      "rows": 761,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_F",
+      "year": 2022,
+      "rows": 743,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_F",
+      "year": 2023,
+      "rows": 940,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_F",
+      "year": 2024,
+      "rows": 1070,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_F",
+      "year": 2025,
+      "rows": 1085,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_F",
+      "year": 2026,
+      "rows": 816,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_绿开绿收",
+      "year": 2021,
+      "rows": 761,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_绿开绿收",
+      "year": 2022,
+      "rows": 743,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_绿开绿收",
+      "year": 2023,
+      "rows": 940,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_绿开绿收",
+      "year": 2024,
+      "rows": 1070,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_绿开绿收",
+      "year": 2025,
+      "rows": 1085,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "全涨停池_绿开绿收",
+      "year": 2026,
+      "rows": 816,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_D2绿开绿收",
+      "year": 2021,
+      "rows": 760,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_D2绿开绿收",
+      "year": 2022,
+      "rows": 742,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_D2绿开绿收",
+      "year": 2023,
+      "rows": 935,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_D2绿开绿收",
+      "year": 2024,
+      "rows": 1070,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_D2绿开绿收",
+      "year": 2025,
+      "rows": 1083,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_D2绿开绿收",
+      "year": 2026,
+      "rows": 811,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_F",
+      "year": 2021,
+      "rows": 761,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_F",
+      "year": 2022,
+      "rows": 743,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_F",
+      "year": 2023,
+      "rows": 940,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_F",
+      "year": 2024,
+      "rows": 1070,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_F",
+      "year": 2025,
+      "rows": 1085,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_F",
+      "year": 2026,
+      "rows": 816,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_最终亏超7",
+      "year": 2021,
+      "rows": 761,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_最终亏超7",
+      "year": 2022,
+      "rows": 743,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_最终亏超7",
+      "year": 2023,
+      "rows": 935,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_最终亏超7",
+      "year": 2024,
+      "rows": 1070,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_最终亏超7",
+      "year": 2025,
+      "rows": 1085,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_最终亏超7",
+      "year": 2026,
+      "rows": 814,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_绿开绿收",
+      "year": 2021,
+      "rows": 761,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_绿开绿收",
+      "year": 2022,
+      "rows": 743,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_绿开绿收",
+      "year": 2023,
+      "rows": 940,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_绿开绿收",
+      "year": 2024,
+      "rows": 1070,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_绿开绿收",
+      "year": 2025,
+      "rows": 1085,
+      "max_score_error": 0.0
+    },
+    {
+      "name": "选中池_绿开绿收",
+      "year": 2026,
+      "rows": 816,
+      "max_score_error": 0.0
+    }
+  ],
+  "train_valid_date_assertions": "passed",
+  "hashes_sha256": {
+    "outputs/三模型全月_20261113/早期/全部输入.pkl.gz": "2496846455723c2f4cbb390ee3882da819a25621e6a18ae9cbfe06f1b103b56b",
+    "outputs/三模型全月_20261113/全部输入.pkl.gz": "2586b0c447816f40d7adf3bbc843d6824a828e314951fd4bccd19ec5279c7aac",
+    "outputs/三模型全月_20261113/近月/全部输入.pkl.gz": "1dfd9c610388da542a3eb317beeb5b14ae5e3ee345330a3f4f5ddb2008efef2f",
+    "outputs/三模型全月_20261113/D1状态样本全景_20261114/全候选D1分支明细.pkl.gz": "0a01510117366075b900e5a09faad54a4f588bba1ce52d2ff66406ed215c2661",
+    "scripts/research_three_f_risk_20261114.py": "105733d4bd8fa7fd47278bdfd021c9528918d1b7219cc7cb2e1159fd42162386",
+    "scripts/research_three_final_loss_20261114.py": "2c87172cd18dd76db0c1f68c9516bd4ba1d6ac6141f37582dc40a1c886d88261",
+    "scripts/verify_three_f_risk_20261114.py": "72808726b4c0fa057dabf3dcb203dc4a4902497a295defe1810593bb9d0d0bd0"
+  }
+}

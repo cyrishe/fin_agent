@@ -1,0 +1,10 @@
+from pathlib import Path
+import subprocess,sys,hashlib,json
+import pandas as pd,numpy as np
+R=Path('/Volumes/ext/fin_agent');O=Path(__file__).parent;P=R/'outputs/最近两周三模型_20261113';old=P/'十一月F风控_20261114';manifest=json.loads((old/'核验.json').read_text());verify={f:hashlib.sha256((R/f).read_bytes()).hexdigest()==sha for f,sha in manifest['hashes'].items()};assert all(verify.values()),[f for f,ok in verify.items() if not ok]
+for filename in ['research_three_nov_f_score_20261114.py','research_three_nov_f_replay_20261114.py']:
+ s=(R/'scripts'/filename).read_text();assert "O=P/'十一月F风控_20261114'" in s;s=s.replace("O=P/'十一月F风控_20261114'",f"O=Path({str(O)!r})");(O/filename).write_text(s)
+ with (O/(filename+'.log')).open('w') as log: subprocess.run([sys.executable,str(O/filename)],cwd=R,stdout=log,stderr=subprocess.STDOUT,check=True)
+raw=pd.read_csv(O/'风险明细.csv',dtype={'symbol':str});prev=pd.read_csv(old/'风险明细.csv',dtype={'symbol':str});a=raw.merge(prev,on=['d0_date','symbol'],suffixes=('_new','_old'),validate='one_to_one');assert len(a)==len(raw)==len(prev)==46;assert (a.排除_new==a.排除_old).all();maxscore=max((a[f'{col}_new']-a[f'{col}_old']).abs().max() for col in ['选中池分数','全池分数']);assert maxscore<1e-12
+e=pd.read_csv(O/'固定10万卖出分钟.csv',dtype={'symbol':str});z=pd.read_csv(O/'原名单与过滤逐笔.csv',dtype={'symbol':str});ret=e.groupby(['d0_date','symbol']).fee_cash.sum().reset_index();t=z[z.状态.eq('已卖完')].merge(ret,on=['d0_date','symbol'],validate='one_to_one');err=(100*(t.fee_cash/100000-1)-t['原策略收益%']).abs().max();assert err<1e-10;assert (e.qty<=.1*e.bar_volume+1e-6).all();prevz=pd.read_csv(old/'原名单与过滤逐笔.csv',dtype={'symbol':str});b=z.merge(prevz,on=['d0_date','symbol'],suffixes=('_new','_old'),validate='one_to_one');assert (b.状态_new==b.状态_old).all();d=(b['原策略收益%_new']-b['原策略收益%_old']).abs().max();assert d<1e-10
+result={'源文件哈希全部一致':all(verify.values()),'候选':len(z),'排除':int(z.排除.sum()),'分数最大差':float(maxscore),'历史卖出收益最大差':float(d),'卖出金额重算最大差':float(err),'模拟卖完笔数':len(t),'卖出分钟记录':len(e)};(O/'复核.json').write_text(json.dumps(result,ensure_ascii=False,indent=2));print(json.dumps(result,ensure_ascii=False,indent=2))
