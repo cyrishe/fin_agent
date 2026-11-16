@@ -119,27 +119,6 @@ class FinancialQaPresentationService:
         answer["payload"]["report"] = report
         return [answer, *evidence_blocks]
 
-    @staticmethod
-    def task_receipt_blocks(tool_calls: Sequence[Mapping[str, Any]] | None) -> list[dict[str, Any]]:
-        """Project saved tool receipts through the existing artifact Surface."""
-        receipts: dict[str, dict[str, Any]] = {}
-        for call in tool_calls or []:
-            if not isinstance(call, Mapping) or call.get("error"):
-                continue
-            receipt = call.get("task_receipt")
-            if not isinstance(receipt, Mapping):
-                continue
-            task = receipt.get("task")
-            task_id = _trim(task.get("task_id")) if isinstance(task, Mapping) else ""
-            if not task_id:
-                continue
-            receipts[task_id] = {
-                "block_id": f"user_task_{task_id}", "block_type": "artifact", "kind": "artifact",
-                "semantic": "user_task", "title": "任务", "mode": "replace",
-                "payload": {"artifact_type": "user_task", **deepcopy(dict(receipt))},
-            }
-        return list(receipts.values())
-
     def _merge_compatible_metric_blocks(
         self,
         blocks: Sequence[Mapping[str, Any]],
@@ -221,23 +200,6 @@ class FinancialQaPresentationService:
         index: int,
         thread_id: int | None = None,
     ) -> list[dict[str, Any]]:
-        charts = result_ref.get("charts")
-        if isinstance(charts, list) and charts:
-            evidence = result_ref.get("provider_evidence") or {}
-            resources = [{"resource_id": chart.get("sha256"),
-                "title": "基础走势" if chart.get("name") == "current.png" else "形态局部复核",
-                "uri": chart.get("url"), "mime_type": "image/png",
-                "relation": "本轮生成的同源行情图像"}
-                for chart in charts if isinstance(chart, Mapping)]
-            return [{"block_id": f"financial_qa_visual_{index}", "block_type": "resource",
-                "kind": "resource", "semantic": "finance.kline_visual", "mode": "replace",
-                "title": f"{evidence.get('code', '')} K线看图证据",
-                "payload": {"resources": resources},
-                "domain_context": {"source": "同源日线图像", "as_of": evidence.get("data_as_of")}}]
-        if _trim(result_ref.get("semantic")) == "finance.backtest":
-            backtest_blocks = self._backtest_blocks(result_ref, index=index)
-            if backtest_blocks:
-                return backtest_blocks
         # Presentation describes the data view; query's explicit invocation
         # suffix does not change its chart, labels or evidence shape. The
         # original result reference and execution trace retain the exact API.
@@ -272,27 +234,6 @@ class FinancialQaPresentationService:
             )
             else {}
         )
-        if (
-            api == "stock.quote"
-            and selection.get("mode") == 2
-            and "close" in column_specs
-        ):
-            column_specs["close"] = {
-                **dict(column_specs["close"]),
-                "label": "最新价",
-            }
-        if api == "stock.quote" and selection.get("mode") == 2:
-            mode_two_labels = {
-                "open": "最新分钟开盘价",
-                "amount": "最新分钟成交额",
-                "volumn": "最新分钟成交量",
-            }
-            for column, label in mode_two_labels.items():
-                if column in column_specs:
-                    column_specs[column] = {
-                        **dict(column_specs[column]),
-                        "label": label,
-                    }
         row_count = self._row_count(result_ref, rows)
         meta = self._meta(
             row_count=row_count,
@@ -468,84 +409,6 @@ class FinancialQaPresentationService:
                 "meta": meta,
             }
         ]
-
-    @staticmethod
-    def _backtest_blocks(
-        result_ref: Mapping[str, Any],
-        *,
-        index: int,
-    ) -> list[dict[str, Any]]:
-        presentation = (
-            result_ref.get("backtest_presentation")
-            if isinstance(result_ref.get("backtest_presentation"), Mapping)
-            else {}
-        )
-        metrics = [
-            dict(item)
-            for item in presentation.get("metrics") or []
-            if isinstance(item, Mapping)
-        ]
-        chart = (
-            presentation.get("chart")
-            if isinstance(presentation.get("chart"), Mapping)
-            else {}
-        )
-        chart_series = [
-            dict(item)
-            for item in chart.get("series") or []
-            if isinstance(item, Mapping) and item.get("data")
-        ]
-        blocks: list[dict[str, Any]] = []
-        if metrics:
-            blocks.append(
-                {
-                    "block_id": f"financial_qa_evidence_{index}_backtest_metrics",
-                    "block_type": "data",
-                    "kind": "data",
-                    "semantic": "finance.backtest.metrics",
-                    "mode": "replace",
-                    "title": "回测与基准",
-                    "payload": {
-                        "shape": "record",
-                        "content_type": "finance.backtest.metrics",
-                        "data": {"items": metrics},
-                    },
-                    "presentation_hint": {
-                        "preferred_renderer": "data.metrics",
-                        "density": "compact",
-                    },
-                }
-            )
-        if chart_series:
-            blocks.append(
-                {
-                    "block_id": f"financial_qa_evidence_{index}_backtest_chart",
-                    "block_type": "data",
-                    "kind": "data",
-                    "semantic": "finance.backtest.performance",
-                    "mode": "replace",
-                    "title": "组合与基准走势（起点 100）",
-                    "payload": {
-                        "shape": "timeseries",
-                        "content_type": "finance.backtest.performance",
-                        "data": {
-                            "x_axis": list(chart.get("x_axis") or []),
-                            "series": chart_series,
-                        },
-                    },
-                    "presentation_hint": {
-                        "preferred_renderer": "data.line",
-                        "chart_type": "line_chart",
-                    },
-                    "domain_context": {
-                        "namespace": "finance.backtest",
-                        "markets": ["CN_A"],
-                        "unit": "normalized_index",
-                        "frequency": "daily",
-                    },
-                }
-            )
-        return blocks
 
     @classmethod
     def _evidence_title(

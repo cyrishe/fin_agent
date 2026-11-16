@@ -737,9 +737,6 @@ class FinanceDeepSeekHarnessSessionService:
             "LLM_VISION_MODEL": _trim(os.environ.get("LLM_VISION_MODEL")),
             "LLM_FLASH_MODEL": _trim(os.environ.get("LLM_FLASH_MODEL")) or self.model,
             "LLM_REASONING_MODEL": _trim(os.environ.get("LLM_REASONING_MODEL")) or self.model,
-            "TASK_SQLITE_PATH": os.environ.get("TASK_SQLITE_PATH", ""),
-            "TASK_ARTIFACT_ROOT": os.environ.get("TASK_ARTIFACT_ROOT", ""),
-            "SYSTEM_DB_URL": os.environ.get("SYSTEM_DB_URL", ""),
         }
         for name in ("FINANCE_REPORT_DB_URL", "FINANCE_REPORT_DB_NAME",
                      "FINANCE_REPORT_TABLE", "FINANCE_REPORT_METRIC_FACT_TABLE",
@@ -989,10 +986,6 @@ class FinanceDeepSeekHarnessSessionService:
             "_finance_detail_default_limit": detail_default_limit,
         }
         for context_key in (
-            "_task_actor",
-            "_task_conversation_id",
-            "_task_turn_id",
-            "_task_user_text",
             "allowed_agent_tools",
             "skill_tool_access",
             "allowed_finance_skills",

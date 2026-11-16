@@ -140,46 +140,8 @@
   <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
   <script>
     (() => {
-      const groups = {
-        stock: [
-          ['基础资料', ['basic_info']],
-          ['市场交易', ['quote', 'moneyflow', 'pricevalue', 'margin']],
-          ['财务经营', ['financial_3_table', 'performance_notice', 'business_segment']],
-          ['股权与公司行动', ['shareholder', 'pledge', 'corporate_action']],
-          ['机构研究', ['report', 'report_metric']],
-        ],
-        index: [
-          ['基础资料', ['basic_info']],
-          ['市场数据', ['quote', 'pricevalue']],
-          ['成分关系', ['constitution']],
-        ],
-        industry: [
-          ['行业分类', ['basic_info']],
-          ['成分关系', ['constitution']],
-        ],
-        plate: [
-          ['基础资料', ['basic_info']],
-          ['市场交易', ['quote', 'moneyflow', 'pricevalue']],
-          ['成分关系', ['constitution']],
-        ],
-        hot_event: [
-          ['事件资料', ['base_info']],
-          ['热度状态', ['state']],
-          ['关联股票', ['member']],
-        ],
-        fund: [
-          ['基础资料', ['basic_info']],
-          ['市场行情', ['quote']],
-        ],
-        bond: [
-          ['基础资料', ['basic_info']],
-          ['市场行情', ['quote']],
-        ],
-      };
-      const subjectLabels = {
-        stock: '股票 stock', index: '指数 index', industry: '行业 industry',
-        plate: '板块 plate', hot_event: '热点 hot_event', fund: '基金 fund', bond: '债券 bond',
-      };
+      const groups = { stock: [['机构研究', ['report', 'report_metric']]] };
+      const subjectLabels = { stock: '股票 stock' };
       const colors = ['var(--c1)', 'var(--c2)', 'var(--c3)', 'var(--c4)', 'var(--c5)', 'var(--c6)', 'var(--c7)'];
       const mapElement = document.getElementById('map');
       const statusElement = document.getElementById('status');

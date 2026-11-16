@@ -514,19 +514,6 @@ class FinanceDataToolCatalogService:
             functions.append(function)
         row["functions"] = functions
         if any(
-            function.get("operation") == "query"
-            and str(function.get("api_name", "")).removesuffix(".query") == "stock.quote"
-            and any(str(arg).split("(", 1)[0] == "mode" for arg in function.get("args", {}).get("optional", []))
-            for function in functions
-        ):
-            from src.experiments.staged_data_protocol.phase2.call_structure import (
-                stock_quote_provider_fields,
-            )
-
-            mode_fields = {mode: stock_quote_provider_fields(mode=mode) for mode in (0, 1, 2)}
-            for name, field in model_fields.items():
-                field["modes"] = [mode for mode, names in mode_fields.items() if name in names]
-        if any(
             arg == "filter"
             for cfg in functions
             for args in (cfg.get("args") or {}).values()

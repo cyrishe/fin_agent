@@ -34,12 +34,13 @@ def save(name, value):
 
 def discover():
     import pymysql
-    from src.utils.mysql_utils import StockInfoDbUtils
-    db = StockInfoDbUtils(database='kingdomai')
+    from src.experiments.staged_data_protocol.phase2.report_provider import _connect_report_db, configured_report_tables
+    db = _connect_report_db()
+    table, _, _ = configured_report_tables()
     with db.conn.cursor(pymysql.cursors.DictCursor) as c:
-        c.execute("SELECT security_code,security_name,COUNT(*) reports,COUNT(DISTINCT COALESCE(NULLIF(research_institution,''),publisher)) institutions,MIN(publish_at) earliest,MAX(publish_at) latest FROM reports WHERE publish_at >= %s AND publish_at < %s GROUP BY security_code,security_name ORDER BY reports DESC,security_code LIMIT 15", ('2026-06-08', '2026-09-09'))
+        c.execute(f"SELECT security_code,security_name,COUNT(*) reports,COUNT(DISTINCT COALESCE(NULLIF(research_institution,''),publisher)) institutions,MIN(publish_at) earliest,MAX(publish_at) latest FROM `{table}` WHERE publish_at >= %s AND publish_at < %s GROUP BY security_code,security_name ORDER BY reports DESC,security_code LIMIT 15", ('2026-06-08', '2026-09-09'))
         save('coverage.json', {'date_field': 'publish_at', 'start_inclusive': '2026-06-08', 'end_exclusive': '2026-09-09', 'rows': c.fetchall()})
-        c.execute("SELECT id,security_code,security_name,title,publish_at,COALESCE(NULLIF(research_institution,''),publisher) institution,stock_rating,rating_change,change_reason,investment_highlights,risk_warnings,target_price_lower,target_price_upper,file_hash FROM reports WHERE publish_at >= %s AND publish_at < %s AND security_code IN ('601555','600519','600298') ORDER BY security_code,publish_at DESC,id DESC", ('2026-06-08', '2026-09-09'))
+        c.execute(f"SELECT id,security_code,security_name,title,publish_at,COALESCE(NULLIF(research_institution,''),publisher) institution,stock_rating,rating_change,change_reason,investment_highlights,risk_warnings,target_price_lower,target_price_upper,file_hash FROM `{table}` WHERE publish_at >= %s AND publish_at < %s AND security_code IN ('601555','600519','600298') ORDER BY security_code,publish_at DESC,id DESC", ('2026-06-08', '2026-09-09'))
         rows = c.fetchall()
         save('source_reports.json', rows)
         for row in rows:

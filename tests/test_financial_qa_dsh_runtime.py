@@ -138,16 +138,6 @@ def test_financial_runtime_is_explicit_and_defaults_to_cc() -> None:
         normalize_financial_qa_runtime("auto")
 
 
-def test_web_chat_runtime_uses_configured_default_and_keeps_request_override(
-    monkeypatch,
-) -> None:
-    from src.web import flask_app as web
-
-    monkeypatch.setenv("FINANCE_CHAT_DEFAULT_RUNTIME", "dsh")
-
-    assert web._normalize_chat_financial_qa_runtime(None) == "dsh"
-    assert web._normalize_chat_financial_qa_runtime("") == "dsh"
-    assert web._normalize_chat_financial_qa_runtime("cc") == "cc"
 
 
 def test_dsh_reasoning_effort_defaults_low_and_validates_env(
@@ -233,13 +223,12 @@ def test_dsh_uses_canonical_llm_model_route(
     assert captured[0]["env"]["LLM_API_KEY"] == "server-key"
     assert captured[0]["env"]["LLM_BASE_URL"] == captured[0]["base_url"]
     assert captured[0]["env"]["LLM_DEFAULT_MODEL"] == "server-model"
-    assert captured[0]["env"]["TASK_SQLITE_PATH"] == str(tmp_path / "tasks.sqlite3")
-    assert captured[0]["env"]["SYSTEM_DB_URL"] == ""
+    assert "TASK_SQLITE_PATH" not in captured[0]["env"]
+    assert "SYSTEM_DB_URL" not in captured[0]["env"]
     assert captured[0]["env"]["FINANCE_REPORT_DB_URL"] == "mysql://reader:secret@db/client"
     assert captured[0]["env"]["FINANCE_REPORT_TABLE"] == "client_reports"
     patch = Path("config/deepseek_harness/finance_query.patch.yml").read_text()
-    for key in ("LLM_API_KEY", "LLM_BASE_URL", "LLM_DEFAULT_MODEL", "LLM_FLASH_MODEL", "LLM_REASONING_MODEL",
-                "TASK_SQLITE_PATH", "TASK_ARTIFACT_ROOT", "SYSTEM_DB_URL"):
+    for key in ("LLM_API_KEY", "LLM_BASE_URL", "LLM_DEFAULT_MODEL", "LLM_FLASH_MODEL", "LLM_REASONING_MODEL"):
         assert f"{key}: !!js process.env.{key}" in patch
     assert "server-key" not in patch
 
@@ -1025,8 +1014,8 @@ def test_dsh_session_reuses_worker_and_projects_trace(tmp_path: Path) -> None:
     assert second["execution_mode"] == "standard"
     assert observed_contexts[0]["tool_context"]["_finance_execution_mode"] == "fast"
     assert observed_contexts[1]["tool_context"]["_finance_execution_mode"] == "standard"
-    assert observed_contexts[0]["tool_context"]["_task_user_text"] == "本轮原文一"
-    assert observed_contexts[1]["tool_context"]["_task_user_text"] == "本轮原文二"
+    assert "_task_user_text" not in observed_contexts[0]["tool_context"]
+    assert "_task_user_text" not in observed_contexts[1]["tool_context"]
     assert first["tool_calls"][0]["api"] == "stock.quote"
     assert first["result_refs"][0]["result_ref"] == "session://dsh/vars/v1"
     assert first["llm_usage"] == {
@@ -1492,58 +1481,8 @@ def test_dsh_reconnects_worker_when_finance_catalog_revision_changes(
     service.close()
 
 
-def test_chat_runtime_parameter_is_forwarded_only_for_dsh(monkeypatch) -> None:
-    from src.web import flask_app as web
-
-    calls: list[tuple[str, dict]] = []
-
-    class _Primary:
-        enabled = True
-
-        def accepts(self, **kwargs):
-            calls.append(("accepts", kwargs))
-            return True
-
-        def answer(self, **kwargs):
-            calls.append(("answer", kwargs))
-            return {"mode": "financial_qa_dsh", "message": "完成", "items": []}
-
-    monkeypatch.setattr(web, "financial_qa_cc_service", _Primary())
-    result = web._build_chat_dispatch_payload(
-        "茅台收盘价",
-        application_context={},
-        thread_context={},
-        thread_id=7,
-        turn_id=8,
-        owner_id="owner-a",
-        precomputed_plan=_plan(),
-        financial_qa_runtime="dsh",
-        financial_qa_execution_mode="fast",
-    )
-
-    assert result["mode"] == "financial_qa_dsh"
-    assert calls[0][1]["runtime"] == "dsh"
-    assert calls[1][1]["runtime"] == "dsh"
-    assert calls[1][1]["execution_mode"] == "fast"
 
 
-def test_chat_api_rejects_unknown_financial_runtime_before_work() -> None:
-    from src.web import flask_app as web
-
-    client = web.app.test_client()
-    dispatch = client.post(
-        "/api/chat/dispatch",
-        json={"text": "分析贵州茅台", "financial_qa_runtime": "other"},
-    )
-    stream = client.post(
-        "/api/chat/stream/start",
-        json={"text": "分析贵州茅台", "financial_qa_runtime": "other"},
-    )
-
-    assert dispatch.status_code == 400
-    assert stream.status_code == 400
-    assert "cc 或 dsh" in dispatch.get_json()["error"]
-    assert "cc 或 dsh" in stream.get_json()["error"]
 
 
 def test_execution_timing_steps_uses_server_boundaries_and_omits_reasoning():

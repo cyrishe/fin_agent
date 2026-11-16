@@ -8,9 +8,6 @@ from src.experiments.staged_data_protocol.phase2.catalog import (
     catalog_source,
     resolve_api,
 )
-from src.experiments.staged_data_protocol.phase2.intraday_quote_provider import FIELD_SQL
-from src.experiments.staged_data_protocol.phase2.quote_provider import QUOTE_SOURCES
-from src.experiments.staged_data_protocol.phase2.realtime_quote_provider import FIELDS as REALTIME_QUOTE_FIELDS
 from src.experiments.staged_data_protocol.phase2.models import ApiCall, ResultHandle
 from src.experiments.staged_data_protocol.phase2.python_filter import parse_python_filter, FilterSyntaxError, require_separable
 
@@ -96,20 +93,6 @@ class CallStructureError(ValueError):
 
 def _catalog() -> dict[str, Any]:
     return dict(catalog_source())
-
-
-def stock_quote_provider_fields(*, mode: int) -> set[str]:
-    """Fields implemented by each mode, shared by disclosure and validation."""
-    if mode == 2:
-        return set(REALTIME_QUOTE_FIELDS)
-    if mode == 1:
-        return set(FIELD_SQL)
-    return set(QUOTE_SOURCES["stock"].fields)
-
-
-def _stock_quote_fields(*, mode: int) -> set[str]:
-    declared = set(catalog_source()["subjects"]["stock"]["quote"]["fields"])
-    return stock_quote_provider_fields(mode=mode) & declared
 
 
 def structure_call(call: ApiCall) -> dict[str, Any]:
@@ -275,66 +258,9 @@ def validate_call_structure(
 
 
 def runtime_field_contract(call: ApiCall, *, usage: str) -> set[str] | None:
-    """Return the fields the selected execution path actually consumes.
-
-    ``None`` means that the normal dataview contract applies.  A concrete set
-    is used only where one public API routes to materially different result
-    shapes (stock quote modes and K-day result rows).
-    """
-
+    """Report APIs use the fields declared by their catalog view."""
     if usage not in {"filter", "order", "output", "source"}:
         raise ValueError(f"unsupported field-contract usage={usage}")
-    matched = _match_catalog_function(call.api)
-    if not matched:
-        return None
-    subject = str(matched.get("subject") or "")
-    dataview = str(
-        matched.get("runtime_dataview") or matched.get("dataview") or ""
-    )
-    resolved_type = str(matched.get("resolved_type") or "")
-
-    if subject == "stock" and dataview == "quote":
-        quote_mode = _effective_quote_mode(call.args, matched)
-        quote_fields = _stock_quote_fields(
-            # Window/compute paths retain their existing stored-data contract.
-            mode=1 if resolved_type not in {"base", "agg"} and quote_mode > 0 else quote_mode,
-        )
-        if usage == "source" or resolved_type == "base":
-            return set(quote_fields)
-        if resolved_type == "agg":
-            return set(quote_fields) if usage == "filter" else None
-        if resolved_type == "dynamic_cal":
-            return set(quote_fields) if usage == "filter" else None
-        if resolved_type == "kd" and _effective_quote_mode(call.args, matched) > 0:
-            result_fields = (
-                KD_INTRADAY_FILTER_RESULT_FIELDS
-                if usage == "filter"
-                else KD_INTRADAY_OUTPUT_RESULT_FIELDS
-            )
-            return set(quote_fields) | result_fields
-
-    if resolved_type != "kd":
-        return None
-    if subject == "stock" and dataview == "technical":
-        # A daily indicator window returns a statistic, not the source row.
-        fields = {"code", "trade_date", "value", "current_value", "k", "window_count"}
-        return fields if usage != "source" else set(matched.get("fields") or set())
-    if dataview == "margin":
-        if usage in {"order", "output"}:
-            return set(KD_MARGIN_OUTPUT_FIELDS)
-        return set(KD_MARGIN_FILTER_FIELDS)
-    if dataview == "pricevalue":
-        metric = str(matched.get("field") or "")
-        common = KD_COMMON_FILTER_FIELDS | {"current_value", metric}
-        if usage == "output":
-            return common | {"window_count"}
-        if usage == "order":
-            return KD_COMMON_FILTER_FIELDS | {"current_value"}
-        return common
-    if dataview in {"quote", "moneyflow"}:
-        if usage == "output":
-            return set(KD_COMMON_OUTPUT_FIELDS)
-        return set(KD_COMMON_FILTER_FIELDS)
     return None
 
 
@@ -681,51 +607,7 @@ def _computed_fields(view: Any) -> set[str]:
 
 
 def _supports_like(call: ApiCall, matched: Mapping[str, Any]) -> bool:
-    subject = str(matched.get("subject") or "")
-    dataview = str(
-        matched.get("runtime_dataview") or matched.get("dataview") or ""
-    )
-    resolved_type = str(matched.get("resolved_type") or "")
-    if dataview == "base_info" and subject in {"stock", "index", "plate", "fund", "bond"}:
-        return True
-    if subject == "stock" and (
-        dataview in {"report", "report_metric"}
-        or dataview in STOCK_CORPORATE_DATAVIEWS
-    ):
-        return True
-    if (
-        subject == "stock"
-        and dataview == "quote"
-        and resolved_type in {"base", "agg", "kd"}
-    ):
-        return _effective_quote_mode(call.args, matched) > 0
-    return False
-
-
-def _effective_quote_mode(
-    args: Mapping[str, Any],
-    matched: Mapping[str, Any],
-) -> int:
-    field = str(matched.get("field") or "")
-    if field.startswith("minute_") and "mode" not in args and "realtime" not in args:
-        return 1
-    if (
-        str(matched.get("resolved_type") or "") == "kd"
-        and "mode" not in args
-        and "realtime" not in args
-    ):
-        return 0
-    raw = args.get("mode", args.get("realtime", matched.get("default_mode", 0)))
-    if isinstance(raw, bool):
-        return 2 if raw else 0
-    if isinstance(raw, (int, float)):
-        return max(0, min(int(raw), 2))
-    text = str(raw or "").strip().lower()
-    if text in {"1", "true", "yes", "minute", "intraday", "minute_kline"}:
-        return 1
-    if text in {"2", "current", "latest", "realtime", "snapshot"}:
-        return 2
-    return 0
+    return matched.get("subject") == "stock" and matched.get("dataview") in {"report", "report_metric"}
 
 
 def _field_list(raw_fields: Any) -> list[str]:

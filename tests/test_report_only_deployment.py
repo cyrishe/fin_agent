@@ -16,10 +16,9 @@ def test_catalog_and_execution_contract_are_report_only():
     tree = FinanceDataToolCatalogService().build_tree()
     assert [(s['name'], {v['name'] for v in s['dataviews']}) for s in tree['subjects']] == [
         ('stock', {'report', 'report_metric'})]
-    original = json.loads(Path('src/tools/finance_data/catalog/api_view_catalog.json').read_text())
     selected = json.loads(Path('src/tools/finance_data/catalog/report_only_catalog.json').read_text())
+    assert set(selected['subjects']) == {'stock'}
     for view in ('report', 'report_metric'):
-        assert selected['subjects']['stock'][view] == original['subjects']['stock'][view]
         assert resolve_api(f'stock.{view}')
         assert resolve_api(f'stock.{view}.agg')
     call = parse_api_call('r1 = stock.quote(limit = 1) -> code')

@@ -1,7 +1,6 @@
 """Isolated real-HTTP MCP regression: source questions, data only, no replay.
 
-Run from an isolated checkout. Credentials stay in memory; real model usage is
-recorded in the test bucket, including isolated runs.
+Run from an isolated checkout. Credentials stay in memory; the run records model usage in its own trace.
 """
 from __future__ import annotations
 
@@ -23,11 +22,26 @@ from urllib.parse import urlsplit
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-PILOT = ['RTEF001', 'RTE003', 'RTEF164', 'RTEF194', 'RTEF037', 'RTE016']
-REPORT_SOURCES = (
-    'outputs/financial_qa_mainland_eval_20260902/cases_mainland_supported.json',
-    'outputs/financial_qa_mainland_full_increment_20260903/cases_increment_no_news.json',
-)
+PILOT = ['RTE009', 'RTE010', 'RTE017', 'RTE020']
+REPORT_SOURCES = ('tests/evals/report_protocol_regression_four.json',)
+
+
+
+def payload_problems(payload, status):
+    problems = []
+    if status != 200 or payload.get("ok") is not True:
+        problems.append("request_failed")
+    if payload.get("summary"):
+        problems.append("unexpected_generated_summary")
+    detail = payload.get("detail")
+    if not isinstance(detail, dict):
+        return problems + ["detail_missing"]
+    llm_steps = [s for s in detail.get("steps", []) if s.get("kind") == "llm"]
+    if not llm_steps or any(s.get("duration_ms") is None or s.get("usage") is None for s in llm_steps):
+        problems.append("model_step_telemetry_incomplete")
+    if detail.get("turns") != len(llm_steps):
+        problems.append("turn_count_mismatch")
+    return problems
 
 
 def load_report_cases(root=ROOT):
@@ -66,7 +80,6 @@ def main():
     os.chdir(ROOT)
     import httpx
     import uvicorn
-    from scripts.eval_finance_rest_detail import payload_problems
     from src.finance_api.app import create_app
     from src.finance_api.auth import FinanceApiKeyAuth
     from src.finance_api.service import FinanceApiGateway
@@ -78,8 +91,6 @@ def main():
              if args.cases_file else load_report_cases())
     by_id = {c['case_id']: c for c in cases}
     assert len(cases) == len(by_id) and cases
-    if not args.cases_file:
-        assert len(cases) == 184
     selected = args.case_ids or (list(by_id) if args.full or args.cases_file else PILOT)
     folder = args.output_dir.resolve()
     folder.mkdir(parents=True, exist_ok=True)
@@ -118,8 +129,7 @@ def main():
         available = {item['id'] for item in engine.business_skill_catalog.entries()}
         if set(args.allowed_skills) - available:
             parser.error('allowed-skills contains an unregistered system Skill')
-    from src.services.request_usage_service import record_request
-    gateway = FinanceApiGateway(engine=engine, usage_recorder=record_request)
+    gateway = FinanceApiGateway(engine=engine)
     app = create_app(auth=FinanceApiKeyAuth({'report-eval': key}), gateway=gateway)
     sock = socket.socket()
     sock.bind(('127.0.0.1', 0))
@@ -162,7 +172,7 @@ def main():
             'conversation_id_supplied': args.conversation_id,
             'allowed_skills': args.allowed_skills,
             'skill_catalog_revision': engine.business_skill_catalog.revision,
-            'usage_counter': 'test bucket, included in system totals', 'prewarm': warm,
+            'usage_counter': 'disabled', 'prewarm': warm,
             'authentication_checks': auth_checks,
             'policy_sha256': hashlib.sha256((ROOT / 'src/scenarios/financial_qa/dsh_loop_policy.mjs').read_bytes()).hexdigest(),
             'created_at': datetime.now(timezone.utc).isoformat()}

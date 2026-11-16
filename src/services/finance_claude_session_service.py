@@ -15,7 +15,7 @@ import time
 from typing import Any, Callable, Dict, Mapping, Optional
 import uuid
 
-from src.services.agent_providers.claude import ClaudeSdkSkillHarness
+from src.services.claude_provider_config import ClaudeProviderConfig
 from src.services.fixed_upstream_loopback_bridge import (
     FixedUpstreamLoopbackBridge,
 )
@@ -1021,11 +1021,7 @@ class FinanceClaudeSessionService:
     ) -> tuple[_LiveClaudeClient, Dict[str, Any]]:
         from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient, create_sdk_mcp_server
 
-        provider_env = ClaudeSdkSkillHarness(
-            provider=self.provider,
-            model=self.model,
-            query_impl=lambda **_: None,
-        ).provider_env()
+        provider_env = ClaudeProviderConfig(provider=self.provider, model=self.model).provider_env()
         upstream_base_url = _trim(provider_env.get("ANTHROPIC_BASE_URL"))
         if upstream_base_url:
             provider_env["ANTHROPIC_BASE_URL"] = self._provider_base_url(
@@ -1088,10 +1084,6 @@ class FinanceClaudeSessionService:
             runtime_factory = getattr(self.system_tools, "create_runtime", None)
             if callable(runtime_factory):
                 tool_runtime = runtime_factory()
-            else:
-                from src.services.finance_cc_system_tools import FinanceCcToolRuntime
-
-                tool_runtime = FinanceCcToolRuntime()
             tools, allowed_tools, tracker = self.system_tools.build_tools(
                 owner_ids=[owner_id] if owner_id else [],
                 tool_context=tool_context,

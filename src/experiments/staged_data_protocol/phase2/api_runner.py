@@ -4,40 +4,10 @@ import re
 from dataclasses import replace
 from typing import Mapping
 
-from src.experiments.staged_data_protocol.phase2.base_info_provider import execute_base_info_api
 from src.experiments.staged_data_protocol.phase2.catalog import resolve_api
-from src.experiments.staged_data_protocol.phase2.constitution_provider import (
-    execute_constitution_agg_api,
-    execute_constitution_api,
-    execute_industry_base_info_api,
-)
-from src.experiments.staged_data_protocol.phase2.dynamic_cal_provider import execute_dynamic_quote_api
-from src.experiments.staged_data_protocol.phase2.financial_provider import execute_financial_3_table_api
-from src.experiments.staged_data_protocol.phase2.hot_event_provider import execute_hot_event_api
-from src.experiments.staged_data_protocol.phase2.intraday_quote_provider import (
-    execute_intraday_quote_agg_api,
-    execute_intraday_quote_api,
-    execute_kd_intraday_quote_api,
-)
-from src.experiments.staged_data_protocol.phase2.margin_provider import execute_kd_margin_api, execute_margin_api
-from src.experiments.staged_data_protocol.phase2.moneyflow_provider import execute_kd_moneyflow_api, execute_moneyflow_api
 from src.experiments.staged_data_protocol.phase2.models import ApiCall, ResultHandle
-from src.experiments.staged_data_protocol.phase2.python_filter import condition, bind_references, certainly_empty, predicates, map_predicates
-from src.experiments.staged_data_protocol.phase2.pricevalue_provider import execute_kd_pricevalue_api, execute_pricevalue_api
-from src.experiments.staged_data_protocol.phase2.quote_provider import execute_kd_quote_api, execute_quote_agg_api, execute_quote_api
-from src.experiments.staged_data_protocol.phase2.report_provider import (
-    execute_report_agg_api,
-    execute_report_api,
-    execute_report_metric_api,
-)
-from src.experiments.staged_data_protocol.phase2.realtime_quote_provider import execute_realtime_quote_api
-from src.experiments.staged_data_protocol.phase2.stock_corporate_provider import execute_stock_corporate_api
-from src.experiments.staged_data_protocol.phase2.technical_provider import (
-    execute_technical_api,
-    execute_technical_aggregate_api,
-    execute_technical_window_api,
-)
-from src.experiments.staged_data_protocol.phase2.technical_history_provider import execute_history_api
+from src.experiments.staged_data_protocol.phase2.python_filter import condition, bind_references, certainly_empty, predicates
+from src.experiments.staged_data_protocol.phase2.report_provider import execute_report_api, execute_report_metric_api, execute_report_agg_api
 
 
 REF_RE = re.compile(r"\b(r\d+)\.([A-Za-z_]\w*)\b")
@@ -71,9 +41,6 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
         # Bind the tree, never interpolate result values into expression text.
         call = replace(call, args={**call.args, "_filter_expression": bind_references(expression, previous_results)})
     resolved = resolve_api(call.api)
-    if expression is not None and resolved and resolved.get("subject") == "plate" and resolved.get("dataview") in {"quote", "moneyflow", "pricevalue"}:
-        aliases = {"plate_code": "code", "plate_name": "name"}
-        call.args["_filter_expression"] = map_predicates(call.args["_filter_expression"], lambda p: {**p, "field": aliases.get(p["field"], p["field"])})
     columns = [_output_column(item) for item in call.outputs]
     if expression is not None and certainly_empty(call.args["_filter_expression"]):
         refs = [f"{p['value']['result']}.{p['value']['field']}" for p in predicates(expression) if isinstance(p.get("value"), dict)]
@@ -162,317 +129,19 @@ def execute_api_call(call: ApiCall, previous_results: Mapping[str, ResultHandle]
         previous_results,
         skip_keys=skipped_ref_args,
     )
-    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "stock" and resolved.get("dataview") in {"technical_series", "kline_patterns"}:
-        data = execute_history_api(patterns=resolved["dataview"] == "kline_patterns", args=call.args, outputs=call.outputs)
-        return ResultHandle(name=call.result_id, api=call.api, columns=data.get("columns", columns), data=data)
-    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "stock" and resolved.get("dataview") in {"technical", "technical_minute", "technical_realtime", "technical_minute_series"}:
-        data = execute_technical_api(minute=resolved["dataview"] == "technical_minute",
-            realtime=resolved["dataview"] == "technical_realtime",
-            window=resolved["dataview"] == "technical_minute_series", args=call.args, outputs=call.outputs)
-        return ResultHandle(name=call.result_id, api=call.api, columns=data.get("columns", columns), data=data)
-    if resolved and resolved.get("subject") == "stock" and resolved.get("dataview") == "technical":
-        if resolved.get("type") == "kd":
-            data = execute_technical_window_api(field=resolved["field"], method=resolved["method"], args=call.args, outputs=call.outputs)
-            return ResultHandle(name=call.result_id, api=call.api, columns=data.get("columns", columns), data=data)
-        if resolved.get("type") == "agg":
-            data = execute_technical_aggregate_api(args=call.args, outputs=call.outputs)
-            return ResultHandle(name=call.result_id, api=call.api, columns=data.get("columns", columns), data=data)
-    if resolved and resolved.get("type") == "base" and resolved.get("dataview") == "quote":
-        subject = str(resolved.get("subject") or "")
-        quote_mode = _stock_quote_mode(call.args, resolved)
-        if subject == "stock" and quote_mode == 2:
-            data = execute_realtime_quote_api(args=call.args, outputs=call.outputs)
-        elif subject == "stock" and quote_mode == 1:
-            data = execute_intraday_quote_api(
-                args=call.args,
-                outputs=call.outputs,
-            )
-        else:
-            data = execute_quote_api(subject=subject, args=call.args, outputs=call.outputs)
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("dataview") == "moneyflow":
-        data = execute_moneyflow_api(
-            subject=str(resolved.get("subject") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("dataview") == "margin":
-        data = execute_margin_api(
-            subject=str(resolved.get("subject") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("dataview") == "pricevalue":
-        data = execute_pricevalue_api(
-            subject=str(resolved.get("subject") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("dataview") == "financial_3_table":
-        data = execute_financial_3_table_api(
-            subject=str(resolved.get("subject") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("dataview") == "base_info" and resolved.get("subject") in {
-        "stock",
-        "index",
-        "plate",
-        "fund",
-        "bond",
-    }:
-        data = execute_base_info_api(
-            subject=str(resolved.get("subject") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "industry" and resolved.get("dataview") == "base_info":
-        data = execute_industry_base_info_api(
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "stock" and resolved.get("dataview") in {
-        "shareholder",
-        "pledge",
-        "corporate_action",
-        "performance_notice",
-        "business_segment",
-    }:
-        data = execute_stock_corporate_api(
-            dataview=str(resolved.get("dataview") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("dataview") == "constitution":
-        data = execute_constitution_api(
-            subject=str(resolved.get("subject") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "hot_event":
-        data = execute_hot_event_api(
-            dataview=str(resolved.get("dataview") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "stock" and resolved.get("dataview") == "report":
-        data = execute_report_api(
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "base" and resolved.get("subject") == "stock" and resolved.get("dataview") == "report_metric":
-        data = execute_report_metric_api(
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "agg" and resolved.get("dataview") == "constitution":
-        data = execute_constitution_agg_api(
-            subject=str(resolved.get("subject") or ""),
-            args=call.args,
-            outputs=call.outputs,
-            previous_results=previous_results,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "agg" and resolved.get("subject") == "stock" and resolved.get("dataview") == "quote":
-        quote_mode = _stock_quote_mode(call.args, resolved)
-        if quote_mode == 2:
-            data = execute_realtime_quote_api(args=call.args, outputs=call.outputs, aggregate=True)
-        elif quote_mode == 1:
-            data = execute_intraday_quote_agg_api(
-                args=call.args,
-                outputs=call.outputs,
-            )
-        else:
-            data = execute_quote_agg_api(
-                subject="stock",
-                args=call.args,
-                outputs=call.outputs,
-            )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "agg" and resolved.get("subject") == "stock" and resolved.get("dataview") in {"report", "report_metric"}:
-        data = execute_report_agg_api(
-            dataview=str(resolved.get("dataview") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "kd" and resolved.get("dataview") == "quote":
-        subject = str(resolved.get("subject") or "")
-        if subject == "stock" and _stock_quote_mode(call.args, resolved) > 0:
-            data = execute_kd_intraday_quote_api(
-                field=str(resolved.get("field") or ""),
-                method=str(resolved.get("method") or ""),
-                args=call.args,
-                outputs=call.outputs,
-            )
-        else:
-            data = execute_kd_quote_api(
-                subject=subject,
-                field=str(resolved.get("field") or ""),
-                method=str(resolved.get("method") or ""),
-                args=call.args,
-                outputs=call.outputs,
-            )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "dynamic_cal" and resolved.get("dataview") == "quote":
-        data = execute_dynamic_quote_api(
-            subject=str(resolved.get("subject") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "kd" and resolved.get("dataview") == "moneyflow":
-        data = execute_kd_moneyflow_api(
-            subject=str(resolved.get("subject") or ""),
-            field=str(resolved.get("field") or ""),
-            method=str(resolved.get("method") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "kd" and resolved.get("dataview") == "margin":
-        data = execute_kd_margin_api(
-            subject=str(resolved.get("subject") or ""),
-            field=str(resolved.get("field") or ""),
-            method=str(resolved.get("method") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-    if resolved and resolved.get("type") == "kd" and resolved.get("dataview") == "pricevalue":
-        data = execute_kd_pricevalue_api(
-            subject=str(resolved.get("subject") or ""),
-            field=str(resolved.get("field") or ""),
-            method=str(resolved.get("method") or ""),
-            args=call.args,
-            outputs=call.outputs,
-        )
-        return ResultHandle(
-            name=call.result_id,
-            api=call.api,
-            columns=data.get("columns", columns),
-            data=data,
-        )
-
-    return ResultHandle(
-        name=call.result_id,
-        api=call.api,
-        columns=columns,
-        data={
-            "status": "prepared",
-            "api": call.api,
-            "arguments": call.args,
-            "columns": columns,
-            "rows": [],
-            "provider": "pending_real_api_adapter",
-        },
-    )
+    if resolved and resolved.get("subject") == "stock":
+        view = resolved.get("dataview")
+        if view in {"report", "report_metric"}:
+            if resolved.get("type") == "agg":
+                data = execute_report_agg_api(dataview=view, args=call.args, outputs=call.outputs)
+            else:
+                provider = execute_report_api if view == "report" else execute_report_metric_api
+                data = provider(args=call.args, outputs=call.outputs)
+            return ResultHandle(name=call.result_id, api=call.api,
+                                columns=data.get("columns", columns), data=data)
+    return ResultHandle(name=call.result_id, api=call.api, columns=columns,
+                        data={"status": "unsupported", "api": call.api, "rows": [],
+                              "columns": columns, "reason": "API not available"})
 
 
 def _output_column(output: str) -> str:
@@ -485,36 +154,6 @@ def _output_column(output: str) -> str:
     if "." in text:
         return text.rsplit(".", 1)[-1]
     return text
-
-
-def _stock_quote_mode(args: Mapping[str, object], resolved: Mapping[str, object]) -> int:
-    field = str(resolved.get("field") or "")
-    if field.startswith("minute_") and "mode" not in args and "realtime" not in args:
-        return 1
-    if resolved.get("type") == "kd" and "mode" not in args and "realtime" not in args:
-        return 0
-    # ``realtime`` remains an internal compatibility alias for persisted assets.
-    # Public catalog and model-facing protocol expose only ``mode``.
-    raw = args.get("mode", args.get("realtime", resolved.get("default_mode", 0)))
-    if raw in (None, ""):
-        return int(resolved.get("default_mode", 0) or 0)
-    if isinstance(raw, bool):
-        return 2 if raw else 0
-    if isinstance(raw, (int, float)):
-        return max(0, min(int(raw), 2))
-    text = str(raw).strip().lower()
-    if text in {"0", "false", "no", "history", "historical"}:
-        return 0
-    if text in {"2", "current", "latest", "realtime", "snapshot"}:
-        return 2
-    if text in {"1", "true", "yes", "minute", "intraday", "minute_kline"}:
-        return 1
-    return int(resolved.get("default_mode", 0) or 0)
-
-
-def _quote_realtime_mode(args: Mapping[str, object], resolved: Mapping[str, object]) -> int:
-    """Deprecated compatibility wrapper for non-public callers."""
-    return _stock_quote_mode(args, resolved)
 
 
 def _materialize_call_refs(call: ApiCall, previous_results: Mapping[str, ResultHandle], *, skip_keys: set[str] | None = None) -> ApiCall:

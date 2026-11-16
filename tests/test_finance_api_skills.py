@@ -11,8 +11,7 @@ from src.finance_api.auth import FinanceApiKeyAuth
 from src.finance_api.models import FinanceTaskRequest
 from src.finance_api.service import FinanceApiGateway
 from src.scenarios.financial_qa.service import FinancialQaCcService
-from src.services.skill_candidate_store_service import SkillCandidateStoreError
-from tests.test_finance_skill_first_integration import hub, Session  # Shared published/private fixture.
+from tests.finance_skill_fixtures import Session
 
 
 KEY_A = "skill-api-client-a-test-key-123456"
@@ -20,12 +19,12 @@ KEY_B = "skill-api-client-b-test-key-123456"
 
 
 @pytest.fixture
-def api(hub, monkeypatch):
+def api(monkeypatch):
     monkeypatch.setenv("FINANCE_API_ALLOWED_HOSTS", "testserver,127.0.0.1:*,localhost:*")
     monkeypatch.setenv("FINANCE_API_ALLOWED_ORIGINS", "")
     monkeypatch.setenv("FINANCE_API_ROOT_PATH", "")
     session = Session()
-    engine = FinancialQaCcService(enabled=True, skill_hub_catalog_service=hub,
+    engine = FinancialQaCcService(enabled=True,
         session_service=session, dsh_session_service=session)
     gateway = FinanceApiGateway(engine=engine, principal_owner_ids={"client-a": "alice"})
     app = create_app(auth=FinanceApiKeyAuth({"client-a": KEY_A, "client-b": KEY_B}), gateway=gateway)
@@ -133,28 +132,6 @@ def test_body_cannot_supply_owner_or_access_private_methods(api):
     assert client.post("/v1/finance/task", headers={"X-API-Key": KEY_B}, json=body).status_code == 422
     assert mcp(client, "finance_task", body, key=KEY_B)["isError"]
     assert not session.calls
-
-
-def test_published_personal_skill_remains_unavailable(api, hub):
-    client, session, _ = api
-    hub.set_visibility("personal-report", owner_id="alice", visibility="public", expected_active_revision=1)
-    assert "personal-report" not in {s["id"] for s in mcp(client, "list_skills", key=KEY_B)["structuredContent"]["skills"]}
-    assert mcp(client, "finance_task", {"query": "分析", "skill_ids": ["personal-report"]}, key=KEY_B)["isError"]
-    assert not session.calls
-
-
-def test_registry_failure_falls_back_to_system_without_private_authorization(api, hub, monkeypatch):
-    client, session, _ = api
-    def unavailable(**kwargs):
-        raise SkillCandidateStoreError("INTERNAL_DATABASE_LOCATION")
-    monkeypatch.setattr(hub.candidate_store, "list_available", unavailable)
-    listing = mcp(client, "list_skills")["structuredContent"]
-    assert listing["note"]
-    assert "personal-report" not in {s["id"] for s in listing["skills"]}
-    assert "INTERNAL_DATABASE_LOCATION" not in json.dumps(listing)
-    assert not mcp(client, "finance_task", {"query": "分析", "skill_ids": ["equity-report-analysis"]})["isError"]
-    assert mcp(client, "finance_task", {"query": "分析", "skill_ids": ["personal-report"]})["isError"]
-    assert len(session.calls) == 1
 
 
 def test_direct_data_tool_remains_available(api):

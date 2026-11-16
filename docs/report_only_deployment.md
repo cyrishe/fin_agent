@@ -2,7 +2,7 @@
 
 此分支的客户部署入口是独立服务 `python -m src.finance_api.app`。保留原有 REST 问答、结构化数据查询和 MCP Streamable HTTP：`POST /v1/finance/answer`、`POST /v1/finance/task`、`POST /v1/finance/query`，以及 `/mcp` 中的 `finance_task`、`finance_data_query`、`list_skills`。`conversation_id` 和原有认证协议保持不变。API key 通过 Bearer 或 `X-API-Key` 提供，MCP 允许的 Host/Origin 需配置为实际客户端使用的地址。
 
-数据目录仅开放 `stock.report`、`stock.report_metric` 的明细和聚合，方法目录仅开放 `equity-report-analysis`。问答不再暴露行情、证券身份表、搜索、看图、回测或后台任务工具；无法由研报支持的内容应说明证据不足。原有其他业务代码与完整目录仍留在仓库中，**不要启动通用 Flask Web 服务、任务 worker 或旧的其他服务**；这些不是此客户部署入口，不能视为已关闭其所有接口。
+数据目录仅开放 `stock.report`、`stock.report_metric` 的明细和聚合，方法目录仅开放 `equity-report-analysis`。问答不再暴露行情、证券身份表、搜索、看图、回测或后台任务工具；无法由研报支持的内容应说明证据不足。本分支以独立研报服务作为部署入口。
 
 ## 数据库配置
 

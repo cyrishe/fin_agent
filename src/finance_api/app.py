@@ -50,7 +50,6 @@ from src.finance_api.models import (
 )
 from src.finance_api.service import FinanceApiGateway
 from src.scenarios.financial_qa.business_skills import FinanceSkillUnavailableError
-from src.finance_api.data_status import DataStatusMonitor
 from src.services.request_usage_service import DailyUsageService
 from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
@@ -321,7 +320,6 @@ def create_app(
         return await asyncio.to_thread(current_gateway().list_skills, principal_id=principal.principal_id)
 
     mcp_http_app = mcp.streamable_http_app()
-    data_monitor = DataStatusMonitor()
     daily_usage = DailyUsageService()
 
     @asynccontextmanager
@@ -341,17 +339,9 @@ def create_app(
             except Exception as exc:  # startup remains observable and retryable
                 logger.warning("Finance DSH prewarm failed: %s", exc)
         async with mcp.session_manager.run():
-            monitor_task = None
-            # The general market-data monitor depends on non-report databases.
             try:
                 yield
             finally:
-                if monitor_task:
-                    monitor_task.cancel()
-                    try:
-                        await monitor_task
-                    except asyncio.CancelledError:
-                        pass
                 if owns_gateway and gateway_holder["value"] is not None:
                     gateway_holder["value"].close()
 
@@ -447,21 +437,6 @@ def create_app(
         return HTMLResponse(
             (_STATIC_DIR / "data-map.html").read_text(encoding="utf-8")
         )
-
-    @app.get("/status", response_class=HTMLResponse, include_in_schema=False)
-    async def data_status_page(request: Request) -> HTMLResponse:
-        try:
-            await require_admin_session(request)
-        except HTTPException as exc:
-            if exc.status_code == 401:
-                return RedirectResponse(str(request.scope.get("root_path", "")) + "/login", status_code=303)
-            raise
-        return HTMLResponse((_STATIC_DIR / "status.html").read_text(encoding="utf-8"), headers={"Cache-Control": "no-store, private"})
-
-    @app.get("/status/data", tags=["system"])
-    async def data_status_snapshot(_admin: dict = Depends(require_admin_session)) -> dict[str, Any]:
-        # Requests only read the cached observation; visitors cannot trigger SQL.
-        return data_monitor.current()
 
     @app.get("/mcp-guide", response_class=HTMLResponse, include_in_schema=False)
     async def mcp_guide() -> HTMLResponse:

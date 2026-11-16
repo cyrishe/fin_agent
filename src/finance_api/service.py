@@ -20,7 +20,6 @@ from src.services.finance_data_tool_catalog_service import (
     FinanceDataToolCatalogService,
 )
 from src.services.request_usage_service import record_request, total_tokens
-from src.services.skill_candidate_store_service import SkillCandidateStoreError
 
 
 def _trim(value: Any) -> str:
@@ -81,15 +80,6 @@ class FinanceApiGateway:
     def list_skills(self, *, principal_id: str) -> dict[str, Any]:
         """Project the same authorized business-method catalog used by execution."""
         catalog = self.engine.business_skill_catalog
-        note = ""
-        if self.engine.skill_hub_catalog_service is not None:
-            try:
-                catalog = self.engine.skill_hub_catalog_service.runtime_catalog(
-                    owner_ids=[self.owner_id(principal_id)],
-                )
-            except SkillCandidateStoreError:
-                # Match the execution core's existing system-only fallback.
-                note = "个人 Skill 目录暂不可用，当前仅列出系统方法。"
         snapshot = catalog.discovery_snapshot()
         skills = []
         for entry in snapshot["entries"]:
@@ -103,7 +93,7 @@ class FinanceApiGateway:
                 "category": entry["category"],
                 "active_revision_no": entry["active_revision_no"],
             })
-        return {"revision": snapshot["revision"], "skills": skills, **({"note": note} if note else {})}
+        return {"revision": snapshot["revision"], "skills": skills}
 
     async def execute(
         self,

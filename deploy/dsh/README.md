@@ -8,4 +8,4 @@ Fin 仍使用官方 Python SDK API，通过 `sdk-minimal`、profile patch、MCP 
 
 Fin Harness 的 `master` 保存验证后的维护版本，`upstream/master` 跟踪未修改的官方代码。升级流程和职责见该仓库的 `docs/fin-harness.zh.md`。每次发布记录 Fin Agent commit、Fin Harness commit、配置及 workload；仓库更新不等于生产部署。
 
-`0433ae6-request-history.patch` 保留为历史审查和灾备资产，已包含在锁定版本中，不要再次应用。会话日志包含 `request/history`，回退 Fin 策略时仍需保留能读取该事件的 DSH；更换日志格式前先在副本上验证恢复。最初实现证据见 [效率优化记录](../../docs/development_tasks/dsh_harness_efficiency_implementation_20260910.md)，本次归档和验证见 [仓库建立记录](../../docs/development_tasks/fin_harness_repository_setup_20260926.md)。
+`0433ae6-request-history.patch` 保留为历史审查和灾备资产，已包含在锁定版本中，不要再次应用。会话日志包含 `request/history`，回退 Fin 策略时仍需保留能读取该事件的 DSH；更换日志格式前先在副本上验证恢复。

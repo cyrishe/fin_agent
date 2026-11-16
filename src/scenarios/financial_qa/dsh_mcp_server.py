@@ -162,7 +162,7 @@ class FinanceDshMcpBridge:
             current_catalog_revision != self._catalog_revision_value
         )
         tools_changed = any(self._tool_context(context).get(key) != self._tool_context(self._context).get(key)
-                            for key in ("allowed_agent_tools", "_task_actor"))
+                            for key in ("allowed_agent_tools",))
         if not context_changed and not catalog_changed:
             return
         if context_changed:

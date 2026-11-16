@@ -20,7 +20,7 @@ CATALOG_PATH = (
 
 # These aliases are compatibility inputs accepted by the execution protocol.
 # Canonical dataviews, fields, operations, methods, and examples all come from
-# api_view_catalog.json; they are not re-declared here.
+# report_only_catalog.json; they are not re-declared here.
 DATAVIEW_ALIASES = {
     "basic_info": "base_info",
     "qoute": "quote",

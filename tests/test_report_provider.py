@@ -47,7 +47,7 @@ class _Db:
 
 def test_runtime_and_static_report_catalogs_keep_four_apis_in_sync() -> None:
     payload = json.loads(
-        Path("src/tools/finance_data/catalog/api_view_catalog.json").read_text(
+        Path("src/tools/finance_data/catalog/report_only_catalog.json").read_text(
             encoding="utf-8"
         )
     )

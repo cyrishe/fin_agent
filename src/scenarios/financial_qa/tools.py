@@ -9,22 +9,15 @@ from typing import Any, Callable, Dict, List, Mapping, Optional
 
 from src.experiments.staged_data_protocol.phase2.models import ResultHandle
 from src.experiments.staged_data_protocol.phase2.catalog import OPERATION_DESCRIPTIONS, catalog_source
-from src.experiments.staged_data_protocol.phase2.trade_date_resolver import TradeDateResolver
-from src.backtest import BacktestError
 from src.scenarios.financial_qa.result_registry import FinanceResultRegistry
-from src.scenarios.financial_qa.report import collect_figures
 from src.scenarios.financial_qa.result_view import select_result_page
 from src.scenarios.financial_qa.query_recovery import (
     provider_retry_allowed,
     query_recovery,
 )
-from src.services.backtest_run_service import BacktestRunService
 from src.services.finance_data_tool_catalog_service import FinanceDataToolCatalogService
 from src.services.finance_data_tool_runtime_service import FinanceDataToolRuntimeService
-from src.services.invocation_input_resolver_service import InvocationInputResolverService
 from src.services.session_variable_store_service import SessionVariableStoreService
-from src.services.security_identity_service import SecurityIdentityService
-from src.skill_runtime.tool_adapter import ToolAdapter
 
 
 def _trim(value: Any) -> str:
@@ -126,86 +119,6 @@ def _model_step_summary(summary: Mapping[str, Any]) -> Dict[str, Any]:
     if compact_evidence:
         projected["step_evidence"] = compact_evidence
     return projected
-
-
-def _backtest_presentation(comparison: Mapping[str, Any]) -> Dict[str, Any]:
-    raw_series = [
-        item
-        for item in comparison.get("series") or []
-        if isinstance(item, Mapping)
-        and isinstance(item.get("normalized_curve"), list)
-        and item.get("normalized_curve")
-    ]
-    date_sets = [
-        {
-            _trim(point.get("date"))
-            for point in item.get("normalized_curve") or []
-            if isinstance(point, Mapping) and _trim(point.get("date"))
-        }
-        for item in raw_series
-    ]
-    common_dates = sorted(set.intersection(*date_sets)) if date_sets else []
-    if len(common_dates) > 500:
-        step = max(1, len(common_dates) // 499)
-        sampled_dates = common_dates[::step]
-        if sampled_dates[-1] != common_dates[-1]:
-            sampled_dates.append(common_dates[-1])
-        common_dates = sampled_dates[:500]
-    chart_series = []
-    for item in raw_series:
-        values = {
-            _trim(point.get("date")): point.get("value")
-            for point in item.get("normalized_curve") or []
-            if isinstance(point, Mapping)
-        }
-        chart_series.append(
-            {
-                "name": _trim(item.get("name")) or _trim(item.get("series_id")),
-                "data": [values[date] for date in common_dates],
-            }
-        )
-    summary = (
-        comparison.get("summary")
-        if isinstance(comparison.get("summary"), Mapping)
-        else {}
-    )
-    primary = (
-        comparison.get("primary_benchmark")
-        if isinstance(comparison.get("primary_benchmark"), Mapping)
-        else {}
-    )
-
-    def percent_item(key: str, label: str) -> Dict[str, Any] | None:
-        value = summary.get(key)
-        if not isinstance(value, (int, float)):
-            return None
-        return {"label": label, "value": round(float(value) * 100, 2), "unit": "%"}
-
-    metric_items = [
-        percent_item("portfolio_total_return", "组合收益"),
-        percent_item(
-            "benchmark_total_return",
-            f"{_trim(primary.get('name')) or '基准'}收益",
-        ),
-        percent_item("excess_return", "超额收益"),
-        percent_item("portfolio_max_drawdown", "组合最大回撤"),
-        percent_item("benchmark_max_drawdown", "基准最大回撤"),
-    ]
-    information_ratio = summary.get("information_ratio")
-    if isinstance(information_ratio, (int, float)):
-        metric_items.append(
-            {
-                "label": "信息比率",
-                "value": round(float(information_ratio), 2),
-            }
-        )
-    return {
-        "metrics": [item for item in metric_items if item is not None],
-        "chart": {
-            "x_axis": common_dates,
-            "series": chart_series,
-        },
-    }
 
 
 def _result_handle(payload: Mapping[str, Any]) -> Optional[ResultHandle]:
@@ -510,11 +423,7 @@ class FinanceDataQueryCcTools:
         finance_runtime: Optional[FinanceDataToolRuntimeService] = None,
         finance_catalog: Optional[FinanceDataToolCatalogService] = None,
         result_store: Optional[SessionVariableStoreService] = None,
-        tool_adapter: Optional[ToolAdapter] = None,
         business_skill_catalog: Any = None,
-        backtest_service: Optional[BacktestRunService] = None,
-        input_resolver: Optional[InvocationInputResolverService] = None,
-        security_identity: Optional[SecurityIdentityService] = None,
     ) -> None:
         if finance_catalog is not None and finance_runtime is None:
             supplied_path = Path(
@@ -527,16 +436,10 @@ class FinanceDataQueryCcTools:
                 raise ValueError(
                     "a custom finance catalog requires a matching finance runtime"
                 )
-        self.finance_runtime = finance_runtime or FinanceDataToolRuntimeService(
-            trade_date_resolver=TradeDateResolver()
-        )
+        self.finance_runtime = finance_runtime or FinanceDataToolRuntimeService()
         self.finance_catalog = finance_catalog or FinanceDataToolCatalogService()
         self.result_store = result_store or SessionVariableStoreService()
-        self.tool_adapter = tool_adapter or ToolAdapter()
         self.business_skill_catalog = business_skill_catalog
-        self.backtest_service = backtest_service or BacktestRunService()
-        self.input_resolver = input_resolver or InvocationInputResolverService()
-        self.security_identity = security_identity or SecurityIdentityService()
 
     def bind_business_skill_catalog(self, catalog: Any) -> None:
         """Bind the immutable business-Skill snapshot used by this CC."""
@@ -1442,277 +1345,6 @@ class FinanceDataQueryCcTools:
             except Exception as exc:
                 return _tool_result({"result_ref": result_ref, "error": str(exc)})
 
-        @tool(
-            "run_backtest",
-            (
-                "Run the simple historical backtest for a fixed basket of A-share stocks. Use it when the user "
-                "asks to observe how a supplied stock list performed over a date range. The default is equal-weight "
-                "buy once and hold; if the user supplied weights, pass every stock's weight. Stocks may come either "
-                "from direct holdings or from one authenticated table attachment already shown in the conversation. "
-                "The server automatically compares against CSI 300 when benchmark is omitted. Set benchmark only "
-                "when the user explicitly names a primary benchmark. Before seeing performance, you may add at most "
-                "two context_benchmarks when the holdings have a clear board, size, or industry concentration and a "
-                "real matching index is known; include a short holding-based reason and omit them when uncertain. "
-                "Do not invent a strategy, rebalance frequency, index, attachment id, file path, or missing weight."
-            ),
-            {
-                "type": "object",
-                "properties": {
-                    "holdings": {
-                        "type": "array",
-                        "maxItems": 10,
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "stock": {"type": "string", "minLength": 1, "maxLength": 100},
-                                "weight": {"type": "number", "exclusiveMinimum": 0, "maximum": 1},
-                            },
-                            "required": ["stock"],
-                            "additionalProperties": False,
-                        },
-                    },
-                    "attachment_source": {
-                        "type": "object",
-                        "properties": {
-                            "attachment_id": {"type": "string", "minLength": 1, "maxLength": 200},
-                            "table_index": {"type": "integer", "minimum": 0},
-                            "stock_column": {"type": ["string", "integer"]},
-                            "weight_column": {"type": ["string", "integer"]},
-                        },
-                        "required": ["attachment_id", "stock_column"],
-                        "additionalProperties": False,
-                    },
-                    "start_date": {"type": "string", "format": "date"},
-                    "end_date": {"type": "string", "format": "date"},
-                    "initial_cash": {"type": "number", "exclusiveMinimum": 0},
-                    "benchmark": {
-                        "type": "string",
-                        "minLength": 1,
-                        "maxLength": 100,
-                        "description": (
-                            "Optional user-specified primary index name or code. Omit to use 沪深300."
-                        ),
-                    },
-                    "context_benchmarks": {
-                        "type": "array",
-                        "maxItems": 2,
-                        "description": (
-                            "Optional additional indices selected from clear holding characteristics before execution."
-                        ),
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "subject": {
-                                    "type": "string",
-                                    "minLength": 1,
-                                    "maxLength": 100,
-                                },
-                                "reason": {
-                                    "type": "string",
-                                    "minLength": 1,
-                                    "maxLength": 300,
-                                },
-                            },
-                            "required": ["subject", "reason"],
-                            "additionalProperties": False,
-                        },
-                    },
-                },
-                "required": ["start_date", "end_date"],
-                "additionalProperties": False,
-            },
-        )
-        async def run_backtest(args: dict[str, Any]) -> dict[str, Any]:
-            call_record: Dict[str, Any] = {
-                "tool": "run_backtest",
-                "start_date": _trim(args.get("start_date")),
-                "end_date": _trim(args.get("end_date")),
-                "benchmark": _trim(args.get("benchmark")) or "沪深300",
-            }
-            tool_runtime.tracker["calls"].append(call_record)
-            direct_holdings = args.get("holdings") if isinstance(args.get("holdings"), list) else []
-            attachment_source = (
-                args.get("attachment_source")
-                if isinstance(args.get("attachment_source"), Mapping)
-                else {}
-            )
-            if bool(direct_holdings) == bool(attachment_source):
-                return _tool_result(
-                    {"ok": False, "error": "请在直接股票列表和附件来源中选择一种输入方式。"}
-                )
-            try:
-                holdings: list[dict[str, Any]]
-                if attachment_source:
-                    columns: Dict[str, Any] = {
-                        "stock": attachment_source.get("stock_column")
-                    }
-                    if attachment_source.get("weight_column") not in (None, ""):
-                        columns["weight"] = attachment_source.get("weight_column")
-                    records = self.input_resolver.materialize_records(
-                        attachment_source,
-                        [
-                            dict(item)
-                            for item in tool_runtime.tool_context.get("_backtest_attachments") or []
-                            if isinstance(item, Mapping)
-                        ],
-                        columns,
-                    )
-                    holdings = [
-                        {
-                            "stock": row.get("stock"),
-                            **({"weight": row.get("weight")} if "weight" in row else {}),
-                        }
-                        for row in records
-                        if _trim(row.get("stock"))
-                    ]
-                    call_record["attachment_id"] = _trim(
-                        attachment_source.get("attachment_id")
-                    )
-                else:
-                    holdings = [dict(item) for item in direct_holdings if isinstance(item, Mapping)]
-                call_record["stock_count"] = len(holdings)
-                tool_runtime.emit_progress(
-                    f"正在回测 {len(holdings)} 只股票的买入并持有组合。",
-                    progress_id="run_backtest",
-                    title="组合回测",
-                )
-                result = await asyncio.to_thread(
-                    self.backtest_service.run,
-                    {
-                        "holdings": holdings,
-                        "start_date": args.get("start_date"),
-                        "end_date": args.get("end_date"),
-                        "initial_cash": args.get("initial_cash"),
-                        "benchmark": args.get("benchmark"),
-                        "context_benchmarks": (
-                            [
-                                dict(item)
-                                for item in args.get("context_benchmarks") or []
-                                if isinstance(item, Mapping)
-                            ]
-                            if isinstance(args.get("context_benchmarks"), list)
-                            else []
-                        ),
-                    },
-                )
-                variable = self.result_store.register_tool_result(
-                    session_id=tool_runtime.result_scope,
-                    tool_name="backtest_run",
-                    result={"ok": True, "data": result},
-                    task=(
-                        f"回测 {len(holdings)} 只股票，"
-                        f"{_trim(args.get('start_date'))} 至 {_trim(args.get('end_date'))}"
-                    ),
-                    runtime_ctx={"conversation_id": tool_runtime.runtime_scope},
-                )
-                summary = result.get("summary") if isinstance(result.get("summary"), Mapping) else {}
-                period = result.get("period") if isinstance(result.get("period"), Mapping) else {}
-                comparison = (
-                    result.get("comparison")
-                    if isinstance(result.get("comparison"), Mapping)
-                    else {}
-                )
-                primary_benchmark = (
-                    comparison.get("primary_benchmark")
-                    if isinstance(comparison.get("primary_benchmark"), Mapping)
-                    else {}
-                )
-                compact = {
-                    "ok": True,
-                    "backtest_type": result.get("backtest_type"),
-                    "strategy": result.get("strategy"),
-                    "period": period,
-                    "stock_count": len(result.get("stocks") or []),
-                    "summary": summary,
-                    "benchmark_comparison": {
-                        "primary_benchmark": {
-                            key: primary_benchmark.get(key)
-                            for key in (
-                                "subject",
-                                "code",
-                                "name",
-                                "source",
-                                "reason",
-                                "period",
-                            )
-                            if primary_benchmark.get(key) not in (None, "")
-                        },
-                        "summary": dict(comparison.get("summary") or {}),
-                        "contextual_benchmarks": [
-                            {
-                                key: item.get(key)
-                                for key in ("subject", "code", "name", "reason", "period")
-                                if item.get(key) not in (None, "")
-                            }
-                            for item in comparison.get("contextual_benchmarks") or []
-                            if isinstance(item, Mapping)
-                        ],
-                        "warnings": list(comparison.get("warnings") or [])[:5],
-                    },
-                    "warnings": list(result.get("warnings") or [])[:5],
-                    "result_ref": variable.get("data_ref") if variable else "",
-                }
-                if variable:
-                    result_ref = {
-                        "tool": "backtest_run",
-                        "result_ref": variable.get("data_ref"),
-                        "data_type": variable.get("data_type"),
-                        "row_count": variable.get("row_count"),
-                        "schema": variable.get("schema"),
-                        "sample": variable.get("sample"),
-                        "semantic": "finance.backtest",
-                        "backtest_presentation": _backtest_presentation(comparison),
-                    }
-                    tool_runtime.tracker["result_refs"].append(result_ref)
-                    call_record["result_ref"] = variable.get("data_ref")
-                tool_runtime.emit_progress(
-                    "组合回测已完成。",
-                    progress_id="run_backtest",
-                    title="组合回测",
-                    status="completed",
-                )
-                return _tool_result(compact)
-            except BacktestError as exc:
-                call_record["error"] = exc.code
-                tool_runtime.emit_progress(
-                    "组合回测未完成，请检查股票、权重和日期。",
-                    progress_id="run_backtest",
-                    title="组合回测",
-                    status="error",
-                )
-                return _tool_result(
-                    {"ok": False, "error_code": exc.code, "error": exc.message, "details": exc.details}
-                )
-            except Exception as exc:
-                call_record["error"] = str(exc)[:1000]
-                return _tool_result({"ok": False, "error": str(exc)})
-
-        @tool(
-            "resolve_security",
-            "按股票名称或代码取得标准代码、名称和交易市场，支持批量。需要确认对象身份时调用；"
-            "已有标识或当前数据接口可直接按名称查询时可直接取数。多候选结合问题确认，零候选保留覆盖边界。",
-            {"type": "object", "properties": {"identifiers": {
-                "type": "array", "minItems": 1, "maxItems": 20,
-                "items": {"type": "string", "minLength": 1, "maxLength": 100}}},
-             "required": ["identifiers"], "additionalProperties": False},
-        )
-        async def resolve_security(args: dict[str, Any]) -> dict[str, Any]:
-            call = {"tool": "resolve_security", "identifiers": args.get("identifiers")}
-            tool_runtime.tracker["calls"].append(call)
-            started = time.monotonic()
-            try:
-                payload = await asyncio.to_thread(self.security_identity.resolve, args.get("identifiers"))
-                call["row_count"] = sum(len(item["candidates"]) for item in payload["items"])
-                return _tool_result(payload)
-            except ValueError as exc:
-                call["error"] = str(exc)
-                return _tool_result({"ok": False, "error": str(exc)})
-            except Exception as exc:
-                call["error"] = type(exc).__name__
-                return _tool_result({"ok": False, "error": "证券身份数据源暂未完成查询。"})
-            finally:
-                call["duration_ms"] = round((time.monotonic() - started) * 1000, 3)
-
         # This deployment only exposes the report data workflow. Report rows
         # themselves contain security names and codes; no identity table is required.
         tools = [read_finance_catalog, finance_query, load_finance_result]
@@ -1878,116 +1510,6 @@ class FinanceDataQueryCcTools:
             return _tool_result(payload)
 
         tools.append(read_finance_skill_reference)
-        configured_tool_names = []
-        configured_specs = (
-            self.tool_adapter.list_tool_specs(configured_tool_names)
-            if configured_tool_names
-            else []
-        )
-        for spec in configured_specs:
-            if spec.name in {item.name for item in tools}:
-                continue
-            description = _trim(spec.description) or f"Run the configured financial tool {spec.name}."
-            if spec.usage_notes:
-                description = "\n".join([description, *spec.usage_notes])
-            description = "\n".join(
-                [
-                    description,
-                    (
-                        "根据本工具声明的数据范围处理尚未完成的数据目标，复用本轮已取得的结果。"
-                    ),
-                ]
-            )
-            input_schema = (
-                spec.schema
-                if isinstance(spec.schema, dict) and spec.schema
-                else {"type": "object", "properties": {}, "additionalProperties": True}
-            )
-
-            async def run_configured_tool(
-                args: dict[str, Any],
-                *,
-                _tool_name: str = spec.name,
-            ) -> dict[str, Any]:
-                call_record: Dict[str, Any] = {
-                    "tool": _tool_name,
-                    "arguments": dict(args or {}),
-                }
-                tool_runtime.tracker["calls"].append(call_record)
-                if not tool_runtime.configured_tool_allowed(_tool_name):
-                    call_record["error"] = "caller_tool_not_allowed"
-                    return _tool_result(
-                        {
-                            "tool": _tool_name,
-                            "ok": False,
-                            "error": "当前用户或运行策略未授权该补充工具。",
-                        }
-                    )
-                try:
-                    raw_result = await asyncio.to_thread(
-                        self.tool_adapter.execute,
-                        _tool_name,
-                        dict(args or {}),
-                    )
-                except Exception as exc:
-                    call_record["error"] = str(exc)[:1_000]
-                    return _tool_result({"tool": _tool_name, "error": str(exc)})
-                result = (
-                    dict(raw_result)
-                    if isinstance(raw_result, Mapping)
-                    else {"ok": True, "data": raw_result}
-                )
-                # Auxiliary model calls are evidence-producing work, not new
-                # agent turns. Keep their usage in trace, outside business text.
-                if isinstance(result.get("llm_calls"), list):
-                    call_record["llm_calls"] = [
-                        {key: item[key] for key in ("stage", "model", "usage", "duration_ms", "finish_reason", "error", "image_sha256") if key in item}
-                        for item in result["llm_calls"] if isinstance(item, Mapping)
-                    ]
-                if result.get("duration_ms") is not None:
-                    call_record["duration_ms"] = result["duration_ms"]
-                if result.get("ok") is False:
-                    call_record["error"] = _trim(result.get("error"))[:1_000]
-                    return _tool_result(result)
-                variable = self.result_store.register_tool_result(
-                    session_id=tool_runtime.result_scope,
-                    tool_name=_tool_name,
-                    result=result,
-                    task=json.dumps(dict(args or {}), ensure_ascii=False, default=str),
-                    runtime_ctx={"conversation_id": tool_runtime.runtime_scope},
-                )
-                if not variable:
-                    return _tool_result(result)
-                summary = {
-                    "tool": _tool_name,
-                    "result_ref": variable.get("data_ref"),
-                    "data_type": variable.get("data_type"),
-                    "row_count": variable.get("row_count"),
-                    "schema": variable.get("schema"),
-                    "sample": variable.get("sample"),
-                }
-                if isinstance(result.get("data"), str):
-                    # A semantic tool result must reach synthesis intact. Large
-                    # documents retain the normal paged result-reference path.
-                    summary["analysis"] = result["data"][:24_000]
-                    summary["sample_complete"] = len(result["data"]) <= 24_000
-                if isinstance(result.get("provider_evidence"), Mapping):
-                    summary["provider_evidence"] = dict(result["provider_evidence"])
-                if result.get("charts"):
-                    summary["figures"] = collect_figures([result], include_images=False)
-                saved_summary = dict(summary)
-                if isinstance(result.get("charts"), list):
-                    # Images go to the renderer and saved result, never back to
-                    # the text-only main model or its next context window.
-                    saved_summary["charts"] = result["charts"]
-                tool_runtime.tracker["result_refs"].append(saved_summary)
-                call_record["result_ref"] = variable.get("data_ref")
-                call_record["row_count"] = variable.get("row_count")
-                return _tool_result(summary)
-
-            tools.append(
-                tool(spec.name, description, input_schema)(run_configured_tool)
-            )
         names = [f"mcp__finance__{item.name}" for item in tools]
         return tools, names, tracker
 

@@ -23,7 +23,7 @@ from src.experiments.staged_data_protocol.phase2.call_structure import (
     parse_filter_expression,
     parse_order,
 )
-from src.utils.mysql_utils import StockInfoDbUtils
+from src.utils.report_db import StockInfoDbUtils
 from src.experiments.staged_data_protocol.phase2.recent_scan import chronological_recent_where, fetch_recent_first
 
 
